@@ -17,7 +17,7 @@ require_once 'bibli_cuiteur.php';
 
 // si utilisateur déjà authentifié, on le redirige vers la page cuiteur_1.php
 if (em_est_authentifie()){
-    header('Location: cuiteur_1.php');
+    header('Location: index.php');
     exit();
 }
 
@@ -28,9 +28,9 @@ $er = isset($_POST['btnSInscrire']) ? eml_traitement_inscription() : array();
 - génération du code HTML de la page
 ------------------------------------------------------------------------------*/
 
-em_aff_debut('Cuiteur | Inscription', '../styles/cuiteur.css');
+em_aff_debut('Cuiteur | Inscription', '../stylescuiteur_1in/cuiteur.css');
 
-em_aff_entete('Inscription');
+em_aff_entete('Inscription', false);
 em_aff_infos(false);
 
 eml_aff_formulaire($er);
@@ -257,7 +257,7 @@ function eml_traitement_inscription(): array {
     mysqli_close($bd);
     
     // redirection vers la page protegee.php
-    header('Location: protegee.php'); //TODO : à modifier dans le projet
+    header('Location: compte.php');
     exit();
 }
 

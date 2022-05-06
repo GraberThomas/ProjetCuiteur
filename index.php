@@ -108,6 +108,6 @@
         }
         $_SESSION['usID'] = $row['usID'];
         mysqli_close($db);
-        header('Location: ./php/Cuiteur.php');
+        header('Location: ./php/cuiteur.php');
         exit();
     }

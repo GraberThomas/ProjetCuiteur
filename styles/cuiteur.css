@@ -69,9 +69,16 @@ body {
     BLOC ENTETE
 --------------------------------------------------------------- */
 header {
-    background: url(../images/entete.jpg) no-repeat;
     height: 270px;
     position: relative;
+}
+
+#header_connected {
+    background: url(../images/entete.jpg) no-repeat;
+}
+
+#header_disconnected {
+    background: url(../images/entete_deconnecte.jpg) no-repeat;
 }
 
 /* Tous les éléments descendants de l'élément header sont positionnés en absolu.
@@ -263,6 +270,7 @@ main li.plusBlablas img{
 a {
     color: #3c96f1;
     text-decoration: none;
+    font-weight: bold;
 }
     
 a:hover {

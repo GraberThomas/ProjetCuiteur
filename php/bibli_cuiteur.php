@@ -47,16 +47,23 @@ define('AGE_MAX', 120);
  * Génération et affichage de l'entete des pages
  *
  * @param ?string    $titre  Titre de l'entete (si null, affichage de l'entete de cuiteur.php avec le formulaire)
+ * @param bool       $with_buttons   If true, show buttons (deconnection, profile modification, ...) => default true
  */
-function em_aff_entete(?string $titre = null):void{
-    echo '<div id="bcContenu">',
-            '<header>',
-                '<a href="../index.html" title="Se déconnecter de cuiteur"></a>',
-                '<a href="../index.html" title="Ma page d\'accueil"></a>',
-                '<a href="../index.html" title="Rechercher des personnes à suivre"></a>',
-                '<a href="../index.html" title="Modifier mes informations personnelles"></a>';
+function em_aff_entete(?string $titre = null, bool $connected=true):void{
+    echo '<div id="bcContenu">';
+    if($connected === true){
+        echo    '<header id="header_connected">';
+    }else{
+        echo '<header id="header_disconnected">';
+    }
+    if($connected === true){
+        echo '<a href="../index.php" title="Se déconnecter de cuiteur"></a>',
+            '<a href="../index.php" title="Ma page d\'accueil"></a>',
+            '<a href="../index.php" title="Rechercher des personnes à suivre"></a>',
+            '<a href="../index.php" title="Modifier mes informations personnelles"></a>';
+    }
     if ($titre === null){
-        echo    '<form action="../index.html" method="POST">',
+        echo    '<form action="../index.php" method="POST">',
                     '<textarea name="txtMessage"></textarea>',
                     '<input type="submit" name="btnPublier" value="" title="Publier mon message">',
                 '</form>';
@@ -81,31 +88,31 @@ function em_aff_infos(bool $connecte = true):void{
             '<ul>',
                 '<li>',
                     '<img src="../images/pdac.jpg" alt="photo de l\'utilisateur">',
-                    '<a href="../index.html" title="Voir mes infos">pdac</a> Pierre Dac',
+                    '<a href="../index.php" title="Voir mes infos">pdac</a> Pierre Dac',
                 '</li>',
-                '<li><a href="../index.html" title="Voir la liste de mes messages">100 blablas</a></li>',
-                '<li><a href="../index.html" title="Voir les personnes que je suis">123 abonnements</a></li>',
-                '<li><a href="../index.html" title="Voir les personnes qui me suivent">34 abonnés</a></li>',                 
+                '<li><a href="../index.php" title="Voir la liste de mes messages">100 blablas</a></li>',
+                '<li><a href="../index.php" title="Voir les personnes que je suis">123 abonnements</a></li>',
+                '<li><a href="../index.php" title="Voir les personnes qui me suivent">34 abonnés</a></li>',                 
             '</ul>',
             '<h3>Tendances</h3>',
             '<ul>',
-                '<li>#<a href="../index.html" title="Voir les blablas contenant ce tag">info</a></li>',
-                '<li>#<a href="../index.html" title="Voir les blablas contenant ce tag">lol</a></li>',
-                '<li>#<a href="../index.html" title="Voir les blablas contenant ce tag">imbécile</a></li>',
-                '<li>#<a href="../index.html" title="Voir les blablas contenant ce tag">fairelafete</a></li>',
-                '<li><a href="../index.html">Toutes les tendances</a><li>',
+                '<li>#<a href="../index.php" title="Voir les blablas contenant ce tag">info</a></li>',
+                '<li>#<a href="../index.php" title="Voir les blablas contenant ce tag">lol</a></li>',
+                '<li>#<a href="../index.php" title="Voir les blablas contenant ce tag">imbécile</a></li>',
+                '<li>#<a href="../index.php" title="Voir les blablas contenant ce tag">fairelafete</a></li>',
+                '<li><a href="../index.php">Toutes les tendances</a><li>',
             '</ul>',
             '<h3>Suggestions</h3>',             
             '<ul>',
                 '<li>',
                     '<img src="../images/yoda.jpg" alt="photo de l\'utilisateur">',
-                    '<a href="../index.html" title="Voir mes infos">yoda</a> Yoda',
+                    '<a href="../index.php" title="Voir mes infos">yoda</a> Yoda',
                 '</li>',       
                 '<li>',
                     '<img src="../images/paulo.jpg" alt="photo de l\'utilisateur">',
-                    '<a href="../index.html" title="Voir mes infos">paulo</a> Jean-Paul Sartre',
+                    '<a href="../index.php" title="Voir mes infos">paulo</a> Jean-Paul Sartre',
                 '</li>',
-                '<li><a href="../index.html">Plus de suggestions</a></li>',
+                '<li><a href="../index.php">Plus de suggestions</a></li>',
             '</ul>';
     }
     echo '</aside>',
@@ -120,14 +127,14 @@ function em_aff_infos(bool $connecte = true):void{
 function em_aff_pied(): void{
     echo    '</main>',
             '<footer>',
-                '<a href="../index.html">A propos</a>',
-                '<a href="../index.html">Publicité</a>',
-                '<a href="../index.html">Patati</a>',
-                '<a href="../index.html">Aide</a>',
-                '<a href="../index.html">Patata</a>',
-                '<a href="../index.html">Stages</a>',
-                '<a href="../index.html">Emplois</a>',
-                '<a href="../index.html">Confidentialité</a>',
+                '<a href="../index.php">A propos</a>',
+                '<a href="../index.php">Publicité</a>',
+                '<a href="../index.php">Patati</a>',
+                '<a href="../index.php">Aide</a>',
+                '<a href="../">Patata</a>',
+                '<a href="../index.php">Stages</a>',
+                '<a href="../index.php">Emplois</a>',
+                '<a href="../index.php">Confidentialité</a>',
             '</footer>',
     '</div>';
 }
@@ -167,7 +174,7 @@ function em_aff_blablas(mysqli_result $r): void {
                     em_html_proteger_sortie($t['blTexte']),
                     '<p class="finMessage">',
                     em_amj_clair($t['blDate']), ' à ', em_heure_clair($t['blHeure']),
-                    '<a href="../index.html">Répondre</a> <a href="../index.html">Recuiter</a></p>',
+                    '<a href="../index.php">Répondre</a> <a href="../index.php">Recuiter</a></p>',
                 '</li>';
     }
 }

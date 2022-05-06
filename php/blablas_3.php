@@ -52,7 +52,7 @@ while ($t = mysqli_fetch_assoc($res)) {
                 em_html_proteger_sortie($t['blTexte']),
                 '<p class="finMessage">',
                 em_amj_clair($t['blDate']), ' à ', em_heure_clair($t['blHeure']),
-                '<a href="../index.html">Répondre</a> <a href="../index.html">Recuiter</a></p>',
+                '<a href="../index.php">Répondre</a> <a href="../index.php">Recuiter</a></p>',
             '</li>';
     ++$i;
 }

@@ -290,7 +290,7 @@ function em_html_proteger_sortie(array|string $content): array|string {
 *  Si on lui transmet un tableau, la fonction renvoie un tableau où toutes les chaines
 *  qu'il contient sont protégées, les autres données du tableau ne sont pas modifiées.  
 *   
-*  @param    objet          $bd         l'objet représentant la connexion au serveur MySQL
+*  @param    mysqli         $bd         l'objet représentant la connexion au serveur MySQL
 *  @param    array|string   $content    la chaine à protéger ou un tableau contenant des chaines à protéger 
 *  @return   array|string               la chaîne protégée ou le tableau
 */  

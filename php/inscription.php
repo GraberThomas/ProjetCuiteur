@@ -28,7 +28,7 @@ $er = isset($_POST['btnSInscrire']) ? eml_traitement_inscription() : array();
 - génération du code HTML de la page
 ------------------------------------------------------------------------------*/
 
-em_aff_debut('Cuiteur | Inscription', '../stylescuiteur_1in/cuiteur.css');
+em_aff_debut('Cuiteur | Inscription', '../styles/cuiteur.css');
 
 em_aff_entete('Inscription', false);
 em_aff_infos(false);

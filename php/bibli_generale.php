@@ -194,6 +194,23 @@ function em_amj_clair(int $amj):string {
 
 //_______________________________________________________________
 /**
+* Convert a date from yyyymmdd to yyyy-mm-dd format to show it in a date input field.
+*
+* We consider that the date is valid.
+*
+* @param  int       $yyyymmdd    the date in yyyymmdd format
+* @return string    The date converted in yyyy-mm-dd format
+*/
+function gh_convert_date_to_input_format(int $yyyymmdd):string {
+    $yyyy = substr($yyyymmdd, 0, 4);
+    $mm = substr($yyyymmdd, 4, 2);
+    $dd = substr($yyyymmdd, 6, 2);
+
+    return $yyyy.'-'.$mm.'-'.$dd;
+}
+
+//_______________________________________________________________
+/**
 * Transformation d'une heure HH:MM:SS en clair.
 *
 *

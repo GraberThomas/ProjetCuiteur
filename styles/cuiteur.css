@@ -64,6 +64,10 @@ body {
     width: 800px;
     padding-bottom: 40px; 
 }
+
+input[type=submit],input[type=reset] {
+    cursor: pointer;
+}
     
 /* ---------------------------------------------------------------
     BLOC ENTETE
@@ -168,7 +172,6 @@ textarea:focus, input:focus {
 header input[type=submit] {
     background: url(../images/haut_parleur.png) no-repeat;
     border: none;
-    cursor: pointer;
     height: 44px;
     left: 457px;
     top: 90px;

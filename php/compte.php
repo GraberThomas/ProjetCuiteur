@@ -1,5 +1,7 @@
 <?php
 
+define('MSG_SUCCESS_MODIFY_PROFILE', 'La mise à jour des informations sur votre compte a bien été effectuée.');
+
 ob_start(); // start output buffering
 session_start();
 
@@ -84,7 +86,7 @@ mysqli_close($db);
             echo '</p>';    
         }
         else if (isset($_POST['btnModifyPersonalInfo'])) {
-            echo '<p class="success">La mise à jour des informations sur votre compte a bien été effectuée.</p>';    
+            echo '<p class="success">'.MSG_SUCCESS_MODIFY_PROFILE.'</p>';  
         }
 
         // The date stored in the database is in sql format, we need to convert it for putting it into the date input field
@@ -140,33 +142,24 @@ function gh_traitement_infos_perso(): array {
     $errors = array();
     
     // verify name
-    if (mb_strlen($_POST['usNom'], 'UTF-8') > LMAX_NOMPRENOM){
-        $errors[] = 'Le nom et le prénom ne peuvent pas dépasser ' . LMAX_NOMPRENOM . ' caractères.';
-    }
-    $noTags = strip_tags($_POST['usNom']);
-    if ($noTags != $_POST['usNom']){
-        $errors[] = 'Le nom et le prénom ne peuvent pas contenir de code HTML.';
-    }
-    else {
-        if( !mb_ereg_match('^[[:alpha:]]([\' -]?[[:alpha:]]+)*$', $_POST['usNom'])){
-            $errors[] = 'Le nom et le prénom contiennent des caractères non autorisés.';
+    gh_verif_nom($_POST['usNom'], $errors);
+
+    // verify date of birth
+    gh_verif_date_naissance($_POST['usDateNaissance'], $errors);
+
+    // verify city
+    if (!empty($_POST['usVille'])) {
+        $noTags = strip_tags($_POST['usVille']);
+        if ($noTags != $_POST['usVille']){
+            $errors[] = 'Le nom de la ville ne peut contenir de balises HTML.';
         }
     }
 
-    // verify date of birth
-    if( !mb_ereg_match('^\d{4}(-\d{2}){2}$', $_POST['usDateNaissance'])){ // old navigator doesn't support date input
-        $errors[] = 'la date de naissance doit être au format "AAAA-MM-JJ".'; 
-    }
-    else{
-        list($annee, $mois, $jour) = explode('-', $_POST['usDateNaissance']);
-        if (!checkdate($mois, $jour, $annee)) {
-            $errors[] = 'La date de naissance n\'est pas valide.'; 
-        }
-        else if (mktime(0,0,0,$mois,$jour,$annee + AGE_MIN) > time()) {
-            $errors[] = 'Vous devez avoir au moins '.AGE_MIN.' ans pour vous inscrire.'; 
-        }
-        else if (mktime(0,0,0,$mois,$jour,$annee + AGE_MAX + 1) < time()) {
-            $errors[] = 'Vous devez avoir au plus '.AGE_MAX.' ans pour vous inscrire.'; 
+    // verify bio
+    if (!empty($_POST['usBio'])) {
+        $noTags = strip_tags($_POST['usBio']);
+        if ($noTags != $_POST['usBio']){
+            $errors[] = 'La biographie ne peut contenir de balises HTML.';
         }
     }
 
@@ -175,17 +168,18 @@ function gh_traitement_infos_perso(): array {
         return $errors;    
     }
     // no error ==> modify user's data in the database
-    $nom = em_bd_proteger_entree($GLOBALS['db'], $_POST['usNom']);
-    $ville = em_bd_proteger_entree($GLOBALS['db'], $_POST['usVille']);
+    $name = em_bd_proteger_entree($GLOBALS['db'], $_POST['usNom']);
+    $city = em_bd_proteger_entree($GLOBALS['db'], $_POST['usVille']);
     $bio = em_bd_proteger_entree($GLOBALS['db'], $_POST['usBio']);
 
-    $aaaammjj = $annee*10000  + $mois*100 + $jour;
+    list($day, $month, $year) = explode('-', $_POST['usDateNaissance']);
+    $yyyymmdd = $year*10000  + $month*100 + $day;
 
 
     $sql = "UPDATE users
-            SET usNom = '$nom',
-            usDateNaissance = '$aaaammjj',
-            usVille = '$ville',
+            SET usNom = '$name',
+            usDateNaissance = '$yyyymmdd',
+            usVille = '$city',
             usBio = '$bio'
             WHERE usID = '$_SESSION[usID]'"; 
     
@@ -219,7 +213,7 @@ function gh_traitement_infos_perso(): array {
             echo '</p>';    
         }
         else if (isset($_POST['btnModifyCuiteurAccountInfo'])) {
-            echo '<p class="success">La mise à jour des informations sur votre compte a bien été effectuée.</p>';
+            echo '<p class="success">'.MSG_SUCCESS_MODIFY_PROFILE.'</p>';
         }
 
         echo '<form method="post" action="compte.php">',
@@ -262,15 +256,10 @@ function gh_traitement_infos_compte_cuiteur(): array {
     $errors = array();
     
     // Verify email format
-    if (mb_strlen($_POST['usMail'], 'UTF-8') > LMAX_EMAIL){
-        $errors[] = 'L\'adresse mail ne peut pas dépasser '.LMAX_EMAIL.' caractères.';
-    }
-    if(! filter_var($_POST['usMail'], FILTER_VALIDATE_EMAIL)) {
-        $errors[] = 'L\'adresse mail n\'est pas valide.';
-    }
+    gh_verif_email($_POST['usMail'], $errors);
 
     // Verify website format
-    if (mb_strlen($_POST['usWeb'], 'UTF-8') > 0 && !filter_var($_POST['usWeb'], FILTER_VALIDATE_URL)) {
+    if (!empty($_POST['usWeb'] && !filter_var($_POST['usWeb'], FILTER_VALIDATE_URL))) {
         $errors[] = 'Le site web n\'est pas valide.';
     }
 
@@ -318,10 +307,10 @@ function gh_traitement_infos_compte_cuiteur(): array {
             echo '</p>';    
         }
         else if (isset($_POST['btnModifyCuiteurAccountSettings'])) {
-            echo '<p class="success">La mise à jour des informations sur votre compte a bien été effectuée.</p>';    
+            echo '<p class="success">'.MSG_SUCCESS_MODIFY_PROFILE.'</p>';  
         }
 
-        $photoProfilPath = $GLOBALS['userData']['usAvecPhoto'] == '1' ? '../upload/' . $_SESSION['usID'] . '.jpg' : '../images/anonyme.jpg';
+        $photoProfilePath = $GLOBALS['userData']['usAvecPhoto'] == '1' ? '../upload/' . $_SESSION['usID'] . '.jpg' : '../images/anonyme.jpg';
 
         echo '<form method="post" action="compte.php" enctype="multipart/form-data">',
                 '<table>';
@@ -333,7 +322,7 @@ function gh_traitement_infos_compte_cuiteur(): array {
                             '<p>Votre photo actuelle :</p>',
                         '</td>',
                         '<td>',
-                            '<img class="photoProfil" src="'.$photoProfilPath.'" alt="Photo de profil">',
+                            '<img class="photoProfil" src="'.$photoProfilePath.'" alt="Photo de profil">',
                             '<p>Taille '.MAX_PHOTO_PROFILE_WEIGHT_KB.'ko maximum</p>',
                             '<p>Image JPG carrée (mini '.MIN_PHOTO_PROFILE_SIZE.'x'.MIN_PHOTO_PROFILE_SIZE.'px)</p>',
                             '<input type="file" name="usPhoto" accept="image/jpeg">',
@@ -396,13 +385,7 @@ function gh_traitement_parametres_compte_cuiteur(): array {
     
     // verify the passwords if they are not empty
     if (mb_strlen($_POST['usPasse'], 'UTF-8') > 0 || mb_strlen($_POST['usPasse2'], 'UTF-8') > 0) {
-        if ($_POST['usPasse'] !== $_POST['usPasse2']) {
-            $errors[] = 'Les mots de passe doivent être identiques.';
-        }
-        $nb = mb_strlen($_POST['usPasse'], 'UTF-8');
-        if ($nb < LMIN_PASSWORD || $nb > LMAX_PASSWORD){
-            $errors[] = 'Le mot de passe doit être constitué de '. LMIN_PASSWORD . ' à ' . LMAX_PASSWORD . ' caractères.';
-        }
+        gh_verif_passe($_POST['usPasse'], $_POST['usPasse2'], $errors);
     }
 
     // verify photo if wanted
@@ -438,11 +421,11 @@ function gh_traitement_parametres_compte_cuiteur(): array {
         $passe = em_bd_proteger_entree($bd, $passe);
     }
 
-    $avecPhoto = $_POST['usAvecPhoto'] == '1' ? '1' : '0';
+    $withPhoto = $_POST['usAvecPhoto'] == '1' ? '1' : '0';
     $photo = $_FILES['usPhoto']['name'];
 
     $sql = "UPDATE users
-            SET usAvecPhoto = '$avecPhoto'";
+            SET usAvecPhoto = '$withPhoto'";
     
     if (isset($passe)) {
         $sql .= ", usPasse = '$passe'";

@@ -224,5 +224,113 @@ function em_session_exit(string $page = '../index.php'):void {
     header("Location: $page");
     exit();
 }
-
-?>
+//____________________Form fields verification___________________
+//_______________________________________________________________
+/**
+ * Verify last name and first name
+ *
+ * - Check if it's not empty 
+ * - Check if it's not too long
+ * - Check if it doesn't contain HTML tags
+ * - Check if it doesn't contain forbidden characters
+ * 
+ * @param string    $name        Last name
+ * @param array    $errors       Array of errors
+ */
+function gh_verif_nom(string $name, array &$errors): void {
+    if (empty($name)) {
+        $errors[] = 'Le nom et le prénom doivent être renseignés.'; 
+    }
+    else {
+        if (mb_strlen($name, 'UTF-8') > LMAX_NOMPRENOM){
+            $errors[] = 'Le nom et le prénom ne peuvent pas dépasser ' . LMAX_NOMPRENOM . ' caractères.';
+        }
+        $noTags = strip_tags($name);
+        if ($noTags != $name){
+            $errors[] = 'Le nom et le prénom ne peuvent pas contenir de code HTML.';
+        }
+        else {
+            if( !mb_ereg_match('^[[:alpha:]]([\' -]?[[:alpha:]]+)*$', $name)){
+                $errors[] = 'Le nom et le prénom contiennent des caractères non autorisés.';
+            }
+        }
+    }
+}
+//_______________________________________________________________
+/**
+ * Verify birth date
+ *
+ * - Check if it's not empty 
+ * - Check if it's in the correct format (YYYY-MM-DD)
+ * - Check if it's valid
+ * - Check if user is older than AGE_MIN years and younger than AGE_MAX
+ * 
+ * @param string   $birthDate    Birth date
+ * @param array    $errors       Array of errors
+ */
+function gh_verif_date_naissance(string $birthDate, array &$errors): void {
+    if (empty($birthDate)){
+        $errors[] = 'La date de naissance doit être renseignée.'; 
+    }
+    else{
+        if( !mb_ereg_match('^\d{4}(-\d{2}){2}$', $birthDate)){ //vieux navigateur qui ne supporte pas le type date ?
+            $errors[] = 'la date de naissance doit être au format "AAAA-MM-JJ".'; 
+        }
+        else{
+            list($year, $month, $day) = explode('-', $birthDate);
+            if (!checkdate($month, $day, $year)) {
+                $errors[] = 'La date de naissance n\'est pas valide.'; 
+            }
+            else if (mktime(0,0,0,$month,$day,$year + AGE_MIN) > time()) {
+                $errors[] = 'Vous devez avoir au moins '.AGE_MIN.' ans pour vous inscrire.'; 
+            }
+            else if (mktime(0,0,0,$month,$day,$year + AGE_MAX + 1) < time()) {
+                $errors[] = 'Vous devez avoir au plus '.AGE_MAX.' ans pour vous inscrire.'; 
+            }
+        }
+    }
+}
+//_______________________________________________________________
+/**
+ * Verify email
+ *
+ * - Check if it's not empty 
+ * - Check if it's not too long
+ * - Check if it's valid (syntax)
+ * 
+ * @param string   $email    Email address
+ * @param array    $errors   Array of errors
+ */
+function gh_verif_email(string $email, array &$errors): void {
+    if (empty($email)){
+        $errors[] = 'L\'adresse mail ne doit pas être vide.'; 
+    }
+    else {
+        if (mb_strlen($email, 'UTF-8') > LMAX_EMAIL){
+            $errors[] = 'L\'adresse mail ne peut pas dépasser '.LMAX_EMAIL.' caractères.';
+        }
+        if(! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors[] = 'L\'adresse mail n\'est pas valide.';
+        }
+    }
+}
+//_______________________________________________________________
+/**
+ * Verify passwords
+ *
+ * - Check if they're equal
+ * - Check if they're not too short or too long
+ * 
+ * @param string   $passe1   Password
+ * @param string   $passe2   Password confirmation
+ * @param array    $errors   Array of errors
+ */
+function gh_verif_passe(string $passe1, string $passe2, array &$errors): void {
+    if ($passe1 !== $passe2) {
+        $errors[] = 'Les mots de passe doivent être identiques.';
+    }
+    $nb = mb_strlen($passe1, 'UTF-8');
+    if ($nb < LMIN_PASSWORD || $nb > LMAX_PASSWORD){
+        $errors[] = 'Le mot de passe doit être constitué de '. LMIN_PASSWORD . ' à ' . LMAX_PASSWORD . ' caractères.';
+    }
+}

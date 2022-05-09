@@ -19,14 +19,13 @@ $db = em_bd_connect();
 - If no error, retrieve user data from database and display it
 ------------------------------------------------------------------------------*/
 $erPersonalInfo = isset($_POST['btnModifyPersonalInfo']) ? gh_traitement_infos_perso() : array();
+$erCuiteurAccountInfo = isset($_POST['btnModifyCuiteurAccountInfo']) ? gh_traitement_infos_compte_cuiteur() : array();
 
-if ($erPersonalInfo == array()) {
-    $sqlUserData = 'SELECT usNom, usDateNaissance, usVille, usBio, usMail, usWeb, usPasse, usAvecPhoto
-                    FROM users
-                    WHERE usID = ' . $_SESSION['usID'];
+$sqlUserData = 'SELECT usNom, usDateNaissance, usVille, usBio, usMail, usWeb, usPasse, usAvecPhoto
+                FROM users
+                WHERE usID = ' . $_SESSION['usID'];
 
-    $userData = mysqli_fetch_assoc(em_bd_send_request($GLOBALS['db'], $sqlUserData));
-}
+$userData = mysqli_fetch_assoc(em_bd_send_request($GLOBALS['db'], $sqlUserData));
 
 /*------------------------------------------------------------------------------
 - Generating the html code for the page
@@ -41,7 +40,7 @@ echo '<p>Cette page vous permet de modifier les informations relatives à votre 
      '<br>';
 
 gh_aff_formulaire_infos_perso($erPersonalInfo);
-gh_aff_formulaire_infos_compte_cuiteur(array());
+gh_aff_formulaire_infos_compte_cuiteur($erCuiteurAccountInfo);
 
 em_aff_pied();
 em_aff_fin();
@@ -87,7 +86,9 @@ mysqli_close($db);
         }
 
         // The date stored in the database is in sql format, we need to convert it for putting it into the date input field
-        $values['usDateNaissance'] = gh_convert_date_to_input_format($values['usDateNaissance']);
+        if (!isset($_POST['btnModifyPersonalInfo'])) {
+            $values['usDateNaissance'] = gh_convert_date_to_input_format($values['usDateNaissance']);
+        }
 
         echo '<form method="post" action="compte.php">',
                 '<table>';
@@ -109,7 +110,7 @@ mysqli_close($db);
                         '</td>',
                     '</tr>',
                 '</table>',
-            '<form>';
+            '</form>';
     }
 
     /**
@@ -120,19 +121,12 @@ mysqli_close($db);
  *      Step 2. modify the data in the database
  *      Step 3. Show back the page with a success message
  *
- * Toutes les erreurs détectées qui nécessitent une modification du code HTML sont considérées comme des tentatives de piratage 
- * et donc entraînent l'appel de la fonction em_session_exit() sauf :
- * - les éventuelles suppressions des attributs required car l'attribut required est une nouveauté apparue dans la version HTML5 et 
- *   nous souhaitons que l'application fonctionne également correctement sur les vieux navigateurs qui ne supportent pas encore HTML5
- * - une éventuelle modification de l'input de type date en input de type text car c'est ce que font les navigateurs qui ne supportent 
- *   pas les input de type date
  *
  * @global array    $_POST
  *
  * @return array    associative array containing the errors if any
  */
 function gh_traitement_infos_perso(): array {
-    
     if( !em_parametres_controle('post', array('usNom', 'usDateNaissance', 'btnModifyPersonalInfo'), array('usVille', 'usBio'))) {
         em_session_exit();   
     }
@@ -237,5 +231,60 @@ function gh_traitement_infos_perso(): array {
                     '</td>',
                 '</tr>',
             '</table>',
-        '<form>';
+        '</form>';
     }
+
+        /**
+ *  Handle the Cuiteur account info form
+ *
+ *      Step 1. Verify the data
+ *                  -> return an array of errors if any
+ *      Step 2. modify the data in the database
+ *      Step 3. Show back the page with a success message
+ *
+ *
+ * @global array    $_POST
+ *
+ * @return array    associative array containing the errors if any
+ */
+function gh_traitement_infos_compte_cuiteur(): array {
+    
+    if( !em_parametres_controle('post', array('usMail', 'btnModifyCuiteurAccountInfo'), array('usWeb'))) {
+        em_session_exit();   
+    }
+    
+    foreach($_POST as &$val){
+        $val = trim($val);
+    }
+    
+    $errors = array();
+    
+    // Verify email format
+    if (mb_strlen($_POST['usMail'], 'UTF-8') > LMAX_EMAIL){
+        $errors[] = 'L\'adresse mail ne peut pas dépasser '.LMAX_EMAIL.' caractères.';
+    }
+    if(! filter_var($_POST['usMail'], FILTER_VALIDATE_EMAIL)) {
+        $errors[] = 'L\'adresse mail n\'est pas valide.';
+    }
+
+    // Verify website format
+    if (!filter_var($_POST['usWeb'], FILTER_VALIDATE_URL)) {
+        $errors[] = 'Le site web n\'est pas valide.';
+    }
+
+    // return the errors array if any   
+    if (count($errors) > 0) {  
+        return $errors;    
+    }
+    // no error ==> modify user's data in the database
+    $email = em_bd_proteger_entree($GLOBALS['db'], $_POST['usMail']);
+    $web = em_bd_proteger_entree($GLOBALS['db'], $_POST['usWeb']);
+
+    $sql = "UPDATE users
+            SET usMail = '$email',
+            usWeb = '$web'
+            WHERE usID = '$_SESSION[usID]'";
+    
+    em_bd_send_request($GLOBALS['db'], $sql);
+    return array();
+}

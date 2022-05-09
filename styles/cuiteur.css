@@ -312,7 +312,7 @@ form tr:last-child td[colspan]{
     text-align: center;
 }
 
-input {
+input, textarea {
     color: #7a370d;
 }
 

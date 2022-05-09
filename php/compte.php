@@ -17,18 +17,18 @@ if (! em_est_authentifie()){
 $db = em_bd_connect();
 
 /*------------------------------------------------------------------------------
+- Get user's data
 - Check form submission
-- If no error, retrieve user data from database and display it
 ------------------------------------------------------------------------------*/
-$erPersonalInfo = isset($_POST['btnModifyPersonalInfo']) ? gh_traitement_infos_perso() : array();
-$erCuiteurAccountInfo = isset($_POST['btnModifyCuiteurAccountInfo']) ? gh_traitement_infos_compte_cuiteur() : array();
-$erCuiteurAccountSettings = isset($_POST['btnModifyCuiteurAccountSettings']) ? gh_traitement_parametres_compte_cuiteur() : array();
-
 $sqlUserData = 'SELECT usNom, usDateNaissance, usVille, usBio, usMail, usWeb, usPasse, usAvecPhoto
                 FROM users
                 WHERE usID = ' . $_SESSION['usID'];
 
 $userData = mysqli_fetch_assoc(em_bd_send_request($GLOBALS['db'], $sqlUserData));
+
+$erPersonalInfo = isset($_POST['btnModifyPersonalInfo']) ? gh_traitement_infos_perso() : array();
+$erCuiteurAccountInfo = isset($_POST['btnModifyCuiteurAccountInfo']) ? gh_traitement_infos_compte_cuiteur() : array();
+$erCuiteurAccountSettings = isset($_POST['btnModifyCuiteurAccountSettings']) ? gh_traitement_parametres_compte_cuiteur() : array();
 
 /*------------------------------------------------------------------------------
 - Generating the html code for the page
@@ -309,8 +309,12 @@ function gh_traitement_infos_compte_cuiteur(): array {
         else if (isset($_POST['btnModifyCuiteurAccountSettings'])) {
             echo '<p class="success">'.MSG_SUCCESS_MODIFY_PROFILE.'</p>';  
         }
-
-        $photoProfilePath = $GLOBALS['userData']['usAvecPhoto'] == '1' ? '../upload/' . $_SESSION['usID'] . '.jpg' : '../images/anonyme.jpg';
+        if ((isset($_POST['btnModifyCuiteurAccountSettings']) && $_POST['usAvecPhoto'] == '1') || (!isset($_POST['btnModifyCuiteurAccountSettings']) && $GLOBALS['userData']['usAvecPhoto'] == '1')) {
+            $photoProfilePath =  '../upload/' . $_SESSION['usID'] . '.jpg';
+        }
+        else {
+            $photoProfilePath = '../images/anonyme.jpg';
+        }
 
         echo '<form method="post" action="compte.php" enctype="multipart/form-data">',
                 '<table>';
@@ -333,7 +337,7 @@ function gh_traitement_infos_compte_cuiteur(): array {
                             '<label for="usAvecPhoto">Utiliser votre photo :</label>',
                         '</td>',
                         '<td>';
-                            if ($GLOBALS['userData']['usAvecPhoto'] == '0' || (isset($_POST['btnModifyCuiteurAccountSettings']) && $_POST['usAvecPhoto'] == '0')) {
+                            if ((isset($_POST['btnModifyCuiteurAccountSettings']) && $_POST['usAvecPhoto'] == '0') || (!isset($_POST['btnModifyCuiteurAccountSettings']) && $GLOBALS['userData']['usAvecPhoto'] == '0')) {
                                 echo '<input type="radio" name="usAvecPhoto" value="0" id="usAvecPhoto" checked>';
                             }
                             else {
@@ -341,7 +345,7 @@ function gh_traitement_infos_compte_cuiteur(): array {
                             }
                             echo '<label for="usAvecPhoto">non</label>';
 
-                            if ($GLOBALS['userData']['usAvecPhoto'] == '1' || (isset($_POST['btnModifyCuiteurAccountSettings']) && $_POST['usAvecPhoto'] == '1')) {
+                            if ((isset($_POST['btnModifyCuiteurAccountSettings']) && $_POST['usAvecPhoto'] == '1') || (!isset($_POST['btnModifyCuiteurAccountSettings']) && $GLOBALS['userData']['usAvecPhoto'] == '1')) {
                                 echo '<input type="radio" name="usAvecPhoto" value="1" id="usAvecPhoto" checked>';
                             }
                             else {
@@ -390,10 +394,10 @@ function gh_traitement_parametres_compte_cuiteur(): array {
 
     // verify photo if wanted
     if ($_POST['usAvecPhoto'] == '1') {
-        if ($_FILES['usPhoto']['size'] == 0) {
-            $errors[] = 'Vous devez sélectionner une photo.';
+        if ($_FILES['usPhoto']['size'] == 0 && !file_exists('../upload/' . $_SESSION['usID'] . '.jpg')) {
+            $errors[] = 'Veuillez sélectionner une photo';
         }
-        else {
+        else if ($_FILES['usPhoto']['size'] > 0) {
             $extension = pathinfo($_FILES['usPhoto']['name'], PATHINFO_EXTENSION);
             if ($extension !== 'jpg') {
                 $errors[] = 'Le fichier doit être un fichier JPG.';
@@ -418,11 +422,10 @@ function gh_traitement_parametres_compte_cuiteur(): array {
     // no error ==> modify user's data in the database
     if ($_POST['usPasse'] !== '') {
         $passe = password_hash($_POST['usPasse'], PASSWORD_DEFAULT);
-        $passe = em_bd_proteger_entree($bd, $passe);
+        $passe = em_bd_proteger_entree($GLOBALS['db'], $passe);
     }
 
     $withPhoto = $_POST['usAvecPhoto'] == '1' ? '1' : '0';
-    $photo = $_FILES['usPhoto']['name'];
 
     $sql = "UPDATE users
             SET usAvecPhoto = '$withPhoto'";
@@ -434,8 +437,8 @@ function gh_traitement_parametres_compte_cuiteur(): array {
     
     em_bd_send_request($GLOBALS['db'], $sql);
 
-    // Upload the photo if wanted
-    if ($_POST['usAvecPhoto'] == '1') {
+    // Upload the photo if wanted, and new one is uploaded
+    if ($_POST['usAvecPhoto'] == '1' && $_FILES['usPhoto']['size'] > 0) {
         $photoProfilPath = '../upload/' . $_SESSION['usID'] . '.jpg';
         // delete the old photo if it exists
         if (file_exists($photoProfilPath)) {

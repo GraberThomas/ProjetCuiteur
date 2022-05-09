@@ -268,7 +268,7 @@ function gh_traitement_infos_compte_cuiteur(): array {
     }
 
     // Verify website format
-    if (!filter_var($_POST['usWeb'], FILTER_VALIDATE_URL)) {
+    if (mb_strlen($_POST['usWeb'], 'UTF-8') > 0 && !filter_var($_POST['usWeb'], FILTER_VALIDATE_URL)) {
         $errors[] = 'Le site web n\'est pas valide.';
     }
 

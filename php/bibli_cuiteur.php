@@ -41,6 +41,8 @@ define('LMAX_PASSWORD', 20);
 define('AGE_MIN', 18);
 define('AGE_MAX', 120);
 
+define('MAX_FILE_SIZE_KB', 2);
+
 
 //_______________________________________________________________
 /**
@@ -87,7 +89,7 @@ function em_aff_infos(bool $connecte = true):void{
             '<h3>Utilisateur</h3>',
             '<ul>',
                 '<li>',
-                    '<img src="../images/pdac.jpg" alt="photo de l\'utilisateur">',
+                    '<img class="photoProfil" src="../images/pdac.jpg" alt="photo de l\'utilisateur">',
                     '<a href="../index.php" title="Voir mes infos">pdac</a> Pierre Dac',
                 '</li>',
                 '<li><a href="../index.php" title="Voir la liste de mes messages">100 blablas</a></li>',
@@ -105,11 +107,11 @@ function em_aff_infos(bool $connecte = true):void{
             '<h3>Suggestions</h3>',             
             '<ul>',
                 '<li>',
-                    '<img src="../images/yoda.jpg" alt="photo de l\'utilisateur">',
+                    '<img class="photoProfil" src="../images/yoda.jpg" alt="photo de l\'utilisateur">',
                     '<a href="../index.php" title="Voir mes infos">yoda</a> Yoda',
                 '</li>',       
                 '<li>',
-                    '<img src="../images/paulo.jpg" alt="photo de l\'utilisateur">',
+                    '<img class="photoProfil" src="../images/paulo.jpg" alt="photo de l\'utilisateur">',
                     '<a href="../index.php" title="Voir mes infos">paulo</a> Jean-Paul Sartre',
                 '</li>',
                 '<li><a href="../index.php">Plus de suggestions</a></li>',

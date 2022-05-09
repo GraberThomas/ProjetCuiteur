@@ -41,6 +41,7 @@ echo '<p>Cette page vous permet de modifier les informations relatives à votre 
 
 gh_aff_formulaire_infos_perso($erPersonalInfo);
 gh_aff_formulaire_infos_compte_cuiteur($erCuiteurAccountInfo);
+gh_aff_formulaire_parametres_compte_cuiteur(array());
 
 em_aff_pied();
 em_aff_fin();
@@ -288,3 +289,82 @@ function gh_traitement_infos_compte_cuiteur(): array {
     em_bd_send_request($GLOBALS['db'], $sql);
     return array();
 }
+
+/**
+     * Show cuiteur account settings form
+     *
+     * @param   array   $err    Array of errors to display
+     * @global  array   $_POST
+     */
+    function gh_aff_formulaire_parametres_compte_cuiteur(array $err): void {
+
+        echo '<h2 class="titleForm">Paramètres de votre compte Cuiteur</h2>';
+
+        // If there are errors, display form with sent values
+        // Else, retrieve the values from database and display form with them
+        if (isset($_POST['btnModifyCuiteurAccountSettings'])) {
+            $values = em_html_proteger_sortie($_POST);
+        }
+        else {
+            $values = $GLOBALS['userData'];
+        }
+
+        if (count($err) > 0) {
+            echo '<p class="error">Les erreurs suivantes ont été détectées :';
+            foreach ($err as $v) {
+                echo '<br> - ', $v;
+            }
+            echo '</p>';    
+        }
+        else if (isset($_POST['btnModifyCuiteurAccountSettings'])) {
+            echo '<p class="success">La mise à jour des informations sur votre compte a bien été effectuée.</p>';    
+        }
+
+        $photoProfilPath = $GLOBALS['userData']['usAvecPhoto'] == '1' ? '../upload/' . $GLOBALS['userData']['usID'] . '.jpg' : '../images/anonyme.jpg';
+
+        echo '<form method="post" action="compte.php">',
+                '<table>';
+
+        em_aff_ligne_input('Changer le mot de passe :', array('type' => 'password', 'name' => 'usPasse', 'value' => ''));
+        em_aff_ligne_input('Répétez le mot de passe :', array('type' => 'password', 'name' => 'passe2', 'value' => ''));
+                echo '<tr>',
+                        '<td>',
+                            '<p>Votre photo actuelle :</p>',
+                        '</td>',
+                        '<td>',
+                            '<img class="photoProfil" src="'.$photoProfilPath.'" alt="Photo de profil">',
+                            '<p>Taille '.MAX_FILE_SIZE_KB.'ko maximum</p>',
+                            '<p>Image JPG carrée (mini 50x50px)</p>',
+                            '<input type="file" name="usPhoto" accept="image/jpeg">',
+                        '</td>',
+                    '</tr>',
+                    '<tr>',
+                        '<td>',
+                            '<label for="usAvecPhoto">Utiliser votre photo :</label>',
+                        '</td>',
+                        '<td>';
+                            if ($GLOBALS['userData']['usAvecPhoto'] == '0') {
+                                echo '<input type="radio" name="usAvecPhoto" value="0" id="usAvecPhoto" checked>';
+                            }
+                            else {
+                                echo '<input type="radio" name="usAvecPhoto" value="0" id="usAvecPhoto">';
+                            }
+                            echo '<label for="usAvecPhoto">non</label>';
+
+                            if ($GLOBALS['userData']['usAvecPhoto'] == '1') {
+                                echo '<input type="radio" name="usAvecPhoto" value="1" id="usAvecPhoto" checked>';
+                            }
+                            else {
+                                echo '<input type="radio" name="usAvecPhoto" value="1" id="usAvecPhoto">';
+                            }
+                            echo '<label for="usAvecPhoto">oui</label>',
+                        '</td>',
+                    '</tr>',
+                    '<tr>',
+                        '<td colspan="2">',
+                            '<input type="submit" name="btnModifyCuiteurAccountSettings" value="Valider">',
+                        '</td>',
+                    '</tr>',
+                '</table>',
+            '</form>';
+    }

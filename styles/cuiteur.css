@@ -68,6 +68,11 @@ body {
 input[type=submit],input[type=reset] {
     cursor: pointer;
 }
+
+.photoProfil {
+    height: 50px;
+    width: 50px;
+}
     
 /* ---------------------------------------------------------------
     BLOC ENTETE
@@ -214,10 +219,8 @@ aside h3 {
 }
         
 aside img {
-    height: 50px;
     margin: 0 4px 4px 0;
     vertical-align: middle;
-    width: 50px;
 }
 
 aside a{

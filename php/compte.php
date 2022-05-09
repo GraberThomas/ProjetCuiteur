@@ -20,6 +20,7 @@ $db = em_bd_connect();
 ------------------------------------------------------------------------------*/
 $erPersonalInfo = isset($_POST['btnModifyPersonalInfo']) ? gh_traitement_infos_perso() : array();
 $erCuiteurAccountInfo = isset($_POST['btnModifyCuiteurAccountInfo']) ? gh_traitement_infos_compte_cuiteur() : array();
+$erCuiteurAccountSettings = isset($_POST['btnModifyCuiteurAccountSettings']) ? gh_traitement_parametres_compte_cuiteur() : array();
 
 $sqlUserData = 'SELECT usNom, usDateNaissance, usVille, usBio, usMail, usWeb, usPasse, usAvecPhoto
                 FROM users
@@ -41,7 +42,7 @@ echo '<p>Cette page vous permet de modifier les informations relatives à votre 
 
 gh_aff_formulaire_infos_perso($erPersonalInfo);
 gh_aff_formulaire_infos_compte_cuiteur($erCuiteurAccountInfo);
-gh_aff_formulaire_parametres_compte_cuiteur(array());
+gh_aff_formulaire_parametres_compte_cuiteur($erCuiteurAccountSettings);
 
 em_aff_pied();
 em_aff_fin();
@@ -320,21 +321,21 @@ function gh_traitement_infos_compte_cuiteur(): array {
             echo '<p class="success">La mise à jour des informations sur votre compte a bien été effectuée.</p>';    
         }
 
-        $photoProfilPath = $GLOBALS['userData']['usAvecPhoto'] == '1' ? '../upload/' . $GLOBALS['userData']['usID'] . '.jpg' : '../images/anonyme.jpg';
+        $photoProfilPath = $GLOBALS['userData']['usAvecPhoto'] == '1' ? '../upload/' . $_SESSION['usID'] . '.jpg' : '../images/anonyme.jpg';
 
-        echo '<form method="post" action="compte.php">',
+        echo '<form method="post" action="compte.php" enctype="multipart/form-data">',
                 '<table>';
 
         em_aff_ligne_input('Changer le mot de passe :', array('type' => 'password', 'name' => 'usPasse', 'value' => ''));
-        em_aff_ligne_input('Répétez le mot de passe :', array('type' => 'password', 'name' => 'passe2', 'value' => ''));
+        em_aff_ligne_input('Répétez le mot de passe :', array('type' => 'password', 'name' => 'usPasse2', 'value' => ''));
                 echo '<tr>',
                         '<td>',
                             '<p>Votre photo actuelle :</p>',
                         '</td>',
                         '<td>',
                             '<img class="photoProfil" src="'.$photoProfilPath.'" alt="Photo de profil">',
-                            '<p>Taille '.MAX_FILE_SIZE_KB.'ko maximum</p>',
-                            '<p>Image JPG carrée (mini 50x50px)</p>',
+                            '<p>Taille '.MAX_PHOTO_PROFILE_WEIGHT_KB.'ko maximum</p>',
+                            '<p>Image JPG carrée (mini '.MIN_PHOTO_PROFILE_SIZE.'x'.MIN_PHOTO_PROFILE_SIZE.'px)</p>',
                             '<input type="file" name="usPhoto" accept="image/jpeg">',
                         '</td>',
                     '</tr>',
@@ -343,7 +344,7 @@ function gh_traitement_infos_compte_cuiteur(): array {
                             '<label for="usAvecPhoto">Utiliser votre photo :</label>',
                         '</td>',
                         '<td>';
-                            if ($GLOBALS['userData']['usAvecPhoto'] == '0') {
+                            if ($GLOBALS['userData']['usAvecPhoto'] == '0' || (isset($_POST['btnModifyCuiteurAccountSettings']) && $_POST['usAvecPhoto'] == '0')) {
                                 echo '<input type="radio" name="usAvecPhoto" value="0" id="usAvecPhoto" checked>';
                             }
                             else {
@@ -351,7 +352,7 @@ function gh_traitement_infos_compte_cuiteur(): array {
                             }
                             echo '<label for="usAvecPhoto">non</label>';
 
-                            if ($GLOBALS['userData']['usAvecPhoto'] == '1') {
+                            if ($GLOBALS['userData']['usAvecPhoto'] == '1' || (isset($_POST['btnModifyCuiteurAccountSettings']) && $_POST['usAvecPhoto'] == '1')) {
                                 echo '<input type="radio" name="usAvecPhoto" value="1" id="usAvecPhoto" checked>';
                             }
                             else {
@@ -368,3 +369,96 @@ function gh_traitement_infos_compte_cuiteur(): array {
                 '</table>',
             '</form>';
     }
+
+       /**
+ *  Handle cuiteur account settings form
+ *
+ *      Step 1. Verify the data
+ *                  -> return an array of errors if any
+ *      Step 2. modify the data in the database
+ *      Step 3. Show back the page with a success message
+ *
+ *
+ * @global array    $_POST
+ *
+ * @return array    associative array containing the errors if any
+ */
+function gh_traitement_parametres_compte_cuiteur(): array {
+    if( !em_parametres_controle('post', array('usAvecPhoto', 'btnModifyCuiteurAccountSettings'), array('usPasse', 'usPasse2', 'usPhoto'))) {
+        em_session_exit();   
+    }
+    
+    foreach($_POST as &$val){
+        $val = trim($val);
+    }
+    
+    $errors = array();
+    
+    // verify the passwords if they are not empty
+    if (mb_strlen($_POST['usPasse'], 'UTF-8') > 0 || mb_strlen($_POST['usPasse2'], 'UTF-8') > 0) {
+        if ($_POST['usPasse'] !== $_POST['usPasse2']) {
+            $errors[] = 'Les mots de passe doivent être identiques.';
+        }
+        $nb = mb_strlen($_POST['usPasse'], 'UTF-8');
+        if ($nb < LMIN_PASSWORD || $nb > LMAX_PASSWORD){
+            $errors[] = 'Le mot de passe doit être constitué de '. LMIN_PASSWORD . ' à ' . LMAX_PASSWORD . ' caractères.';
+        }
+    }
+
+    // verify photo if wanted
+    if ($_POST['usAvecPhoto'] == '1') {
+        if ($_FILES['usPhoto']['size'] == 0) {
+            $errors[] = 'Vous devez sélectionner une photo.';
+        }
+        else {
+            $extension = pathinfo($_FILES['usPhoto']['name'], PATHINFO_EXTENSION);
+            if ($extension !== 'jpg') {
+                $errors[] = 'Le fichier doit être un fichier JPG.';
+            }
+            // check the size
+            $size = getimagesize($_FILES['usPhoto']['tmp_name']);
+            if ($size[0] < 50 || $size[1] < 50) {
+                $errors[] = 'L\'image doit être au moins de '.MIN_PHOTO_PROFILE_SIZE. 'x'.MIN_PHOTO_PROFILE_SIZE.'px.';
+            }
+            // check the weight
+            $maxSizeInBytes = MAX_PHOTO_PROFILE_WEIGHT_KB * 1024;
+            if ($_FILES['usPhoto']['size'] > $maxSizeInBytes) {
+                $errors[] = 'Le fichier doit être inférieur à ' . MAX_PHOTO_PROFILE_WEIGHT_KB . 'ko.';
+            }
+        }
+    }
+
+    // return the errors array if any   
+    if (count($errors) > 0) {  
+        return $errors;    
+    }
+    // no error ==> modify user's data in the database
+    if ($_POST['usPasse'] !== '') {
+        $passe = password_hash($_POST['usPasse'], PASSWORD_DEFAULT);
+        $passe = em_bd_proteger_entree($bd, $passe);
+    }
+
+    $avecPhoto = $_POST['usAvecPhoto'] == '1' ? '1' : '0';
+    $photo = $_FILES['usPhoto']['name'];
+
+    $sql = "UPDATE users
+            SET usAvecPhoto = '$avecPhoto'";
+    
+    if (isset($passe)) {
+        $sql .= ", usPasse = '$passe'";
+    }
+    $sql .= " WHERE usID = '" . $_SESSION['usID'] . "'";
+    
+    em_bd_send_request($GLOBALS['db'], $sql);
+
+    // Upload the photo if wanted
+    if ($_POST['usAvecPhoto'] == '1') {
+        $photoProfilPath = '../upload/' . $_SESSION['usID'] . '.jpg';
+        // delete the old photo if it exists
+        if (file_exists($photoProfilPath)) {
+            unlink($photoProfilPath);
+        }
+        move_uploaded_file($_FILES['usPhoto']['tmp_name'], $photoProfilPath);
+    }
+    return array();
+}

@@ -41,7 +41,8 @@ define('LMAX_PASSWORD', 20);
 define('AGE_MIN', 18);
 define('AGE_MAX', 120);
 
-define('MAX_FILE_SIZE_KB', 2);
+define('MAX_PHOTO_PROFILE_WEIGHT_KB', 50); // in kB
+define('MIN_PHOTO_PROFILE_SIZE', 50); // in px
 
 
 //_______________________________________________________________

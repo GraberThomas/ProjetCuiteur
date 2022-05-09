@@ -444,6 +444,15 @@ function gh_traitement_parametres_compte_cuiteur(): array {
         if (file_exists($photoProfilPath)) {
             unlink($photoProfilPath);
         }
+
+        // redim the photo to the correct size if needed
+        $size = getimagesize($_FILES['usPhoto']['tmp_name']);
+        if ($size[0] != MIN_PHOTO_PROFILE_SIZE || $size[1] != MIN_PHOTO_PROFILE_SIZE) {
+            $image = imagecreatefromjpeg($_FILES['usPhoto']['tmp_name']);
+            $image = imagescale($image, MIN_PHOTO_PROFILE_SIZE, MIN_PHOTO_PROFILE_SIZE);
+            imagejpeg($image, $photoProfilPath);
+        }
+        
         move_uploaded_file($_FILES['usPhoto']['tmp_name'], $photoProfilPath);
     }
     return array();

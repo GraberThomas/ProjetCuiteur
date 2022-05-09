@@ -25,7 +25,7 @@ if ($erPersonalInfo == array()) {
                     FROM users
                     WHERE usID = ' . $_SESSION['usID'];
 
-    $userData = em_bd_send_request($GLOBALS['db'], $sqlUserData);
+    $userData = mysqli_fetch_assoc(em_bd_send_request($GLOBALS['db'], $sqlUserData));
 }
 
 /*------------------------------------------------------------------------------
@@ -38,10 +38,10 @@ em_aff_entete('Paramètres de mon compte', true);
 em_aff_infos(true);
 
 echo '<p>Cette page vous permet de modifier les informations relatives à votre compte.</p>',
-     '<br>',
-     '<h2 class="titleForm">Informations personnelles</h2>',
+     '<br>';
 
 gh_aff_formulaire_infos_perso($erPersonalInfo);
+gh_aff_formulaire_infos_compte_cuiteur(array());
 
 em_aff_pied();
 em_aff_fin();
@@ -63,13 +63,16 @@ mysqli_close($db);
      * @global  array   $_POST
      */
     function gh_aff_formulaire_infos_perso(array $err): void {
+
+        echo '<h2 class="titleForm">Informations personnelles</h2>';
+
         // If there are errors, display form with sent values
         // Else, retrieve the values from database and display form with them
         if (isset($_POST['btnModifyPersonalInfo'])) {
             $values = em_html_proteger_sortie($_POST);
         }
         else {
-            $values = mysqli_fetch_assoc($GLOBALS['userData']);
+            $values = $GLOBALS['userData'];
         }
 
         if (count($err) > 0) {
@@ -193,3 +196,46 @@ function gh_traitement_infos_perso(): array {
     em_bd_send_request($GLOBALS['db'], $sql);
     return array();
 }
+
+/**
+     * Show Cuiteur account info form
+     *
+     * @param   array   $err    Array of errors to display
+     * @global  array   $_POST
+     */
+    function gh_aff_formulaire_infos_compte_cuiteur(array $err): void {
+        echo '<h2 class="titleForm">Informations sur votre compte Cuiteur</h2>';
+
+        // If there are errors, display form with sent values
+        // Else, retrieve the values from database and display form with them
+        if (isset($_POST['btnModifyCuiteurAccountInfo'])) {
+            $values = em_html_proteger_sortie($_POST);
+        }
+        else {
+            $values = $GLOBALS['userData'];
+        }
+
+        if (count($err) > 0) {
+            echo '<p class="error">Les erreurs suivantes ont été détectées :';
+            foreach ($err as $v) {
+                echo '<br> - ', $v;
+            }
+            echo '</p>';    
+        }
+        else if (isset($_POST['btnModifyCuiteurAccountInfo'])) {
+            echo '<p class="success">La mise à jour des informations sur votre compte a bien été effectuée.</p>';
+        }
+
+        echo '<form method="post" action="compte.php">',
+                '<table>';
+
+        em_aff_ligne_input('Adresse email :', array('type' => 'email', 'name' => 'usMail', 'value' => $values['usMail'], 'required' => null));
+        em_aff_ligne_input('Site web :', array('type' => 'text', 'name' => 'usWeb', 'value' => $values['usWeb']));
+            echo '<tr>',
+                    '<td colspan="2">',
+                        '<input type="submit" name="btnModifyCuiteurAccountInfo" value="Valider">',
+                    '</td>',
+                '</tr>',
+            '</table>',
+        '<form>';
+    }

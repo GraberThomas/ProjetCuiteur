@@ -17,7 +17,7 @@ require_once 'bibli_cuiteur.php';
 
 // si utilisateur déjà authentifié, on le redirige vers la page cuiteur_1.php
 if (gh_est_authentifie()){
-    header('Location: index.php');
+    header('Location: ../index.php');
     exit();
 }
 
@@ -28,7 +28,7 @@ $er = isset($_POST['btnSInscrire']) ? eml_traitement_inscription() : array();
 - génération du code HTML de la page
 ------------------------------------------------------------------------------*/
 
-gh_aff_debut('Cuiteur | Inscription', '../stylescuiteur_1in/cuiteur.css');
+gh_aff_debut('Cuiteur | Inscription', '../styles/cuiteur.css');
 
 gh_aff_entete('Inscription', false);
 gh_aff_infos(false);
@@ -137,71 +137,16 @@ function eml_traitement_inscription(): array {
     }
     
     // vérification des mots de passe
-    if ($_POST['passe1'] !== $_POST['passe2']) {
-        $erreurs[] = 'Les mots de passe doivent être identiques.';
-    }
-    $nb = mb_strlen($_POST['passe1'], 'UTF-8');
-    if ($nb < LMIN_PASSWORD || $nb > LMAX_PASSWORD){
-        $erreurs[] = 'Le mot de passe doit être constitué de '. LMIN_PASSWORD . ' à ' . LMAX_PASSWORD . ' caractères.';
-    }
+    gh_verif_passe($_POST['passe1'], $_POST['passe2'], $erreurs);
     
     // vérification des noms et prenoms
-    if (empty($_POST['nomprenom'])) {
-        $erreurs[] = 'Le nom et le prénom doivent être renseignés.'; 
-    }
-    else {
-        if (mb_strlen($_POST['nomprenom'], 'UTF-8') > LMAX_NOMPRENOM){
-            $erreurs[] = 'Le nom et le prénom ne peuvent pas dépasser ' . LMAX_NOMPRENOM . ' caractères.';
-        }
-        $noTags = strip_tags($_POST['nomprenom']);
-        if ($noTags != $_POST['nomprenom']){
-            $erreurs[] = 'Le nom et le prénom ne peuvent pas contenir de code HTML.';
-        }
-        else {
-            if( !mb_ereg_match('^[[:alpha:]]([\' -]?[[:alpha:]]+)*$', $_POST['nomprenom'])){
-                $erreurs[] = 'Le nom et le prénom contiennent des caractères non autorisés.';
-            }
-        }
-    }
+    gh_verif_nom($_POST['nomprenom'], $erreurs);
     
     // vérification du format de l'adresse email
-    if (empty($_POST['email'])){
-        $erreurs[] = 'L\'adresse mail ne doit pas être vide.'; 
-    }
-    else {
-        if (mb_strlen($_POST['email'], 'UTF-8') > LMAX_EMAIL){
-            $erreurs[] = 'L\'adresse mail ne peut pas dépasser '.LMAX_EMAIL.' caractères.';
-        }
-        // la validation faite par le navigateur en utilisant le type email pour l'élément HTML input
-        // est moins forte que celle faite ci-dessous avec la fonction filter_var()
-        // Exemple : 'l@i' passe la validation faite par le navigateur et ne passe pas
-        // celle faite ci-dessous
-        if(! filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
-            $erreurs[] = 'L\'adresse mail n\'est pas valide.';
-        }
-    }
+    gh_verif_email($_POST['email'], $erreurs);
 
     // vérification de la date de naissance
-    if (empty($_POST['naissance'])){
-        $erreurs[] = 'La date de naissance doit être renseignée.'; 
-    }
-    else{
-        if( !mb_ereg_match('^\d{4}(-\d{2}){2}$', $_POST['naissance'])){ //vieux navigateur qui ne supporte pas le type date ?
-            $erreurs[] = 'la date de naissance doit être au format "AAAA-MM-JJ".'; 
-        }
-        else{
-            list($annee, $mois, $jour) = explode('-', $_POST['naissance']);
-            if (!checkdate($mois, $jour, $annee)) {
-                $erreurs[] = 'La date de naissance n\'est pas valide.'; 
-            }
-            else if (mktime(0,0,0,$mois,$jour,$annee + AGE_MIN) > time()) {
-                $erreurs[] = 'Vous devez avoir au moins '.AGE_MIN.' ans pour vous inscrire.'; 
-            }
-            else if (mktime(0,0,0,$mois,$jour,$annee + AGE_MAX + 1) < time()) {
-                $erreurs[] = 'Vous devez avoir au plus '.AGE_MAX.' ans pour vous inscrire.'; 
-            }
-        }
-    }
+    gh_verif_date_naissance($_POST['naissance'], $erreurs);
     
    
     if (count($erreurs) == 0) {

@@ -64,6 +64,15 @@ body {
     width: 800px;
     padding-bottom: 40px; 
 }
+
+input[type=submit],input[type=reset] {
+    cursor: pointer;
+}
+
+.photoProfil {
+    height: 50px;
+    width: 50px;
+}
     
 /* ---------------------------------------------------------------
     BLOC ENTETE
@@ -168,7 +177,6 @@ textarea:focus, input:focus {
 header input[type=submit] {
     background: url(../images/haut_parleur.png) no-repeat;
     border: none;
-    cursor: pointer;
     height: 44px;
     left: 457px;
     top: 90px;
@@ -211,10 +219,8 @@ aside h3 {
 }
         
 aside img {
-    height: 50px;
     margin: 0 4px 4px 0;
     vertical-align: middle;
-    width: 50px;
 }
 
 aside a{
@@ -299,13 +305,14 @@ form table td {
 
 form td:first-child {
     text-align: right;
+    vertical-align: middle;
 }
 
 form tr:last-child td[colspan]{
     text-align: center;
 }
 
-input {
+input, textarea {
     color: #7a370d;
 }
 
@@ -333,6 +340,21 @@ main input[type="submit"]:hover, main input[type="reset"]:hover {
     padding: 5px;
     margin: 10px;
     background: rgba(255, 255, 255, 0.6);
+}
+
+.success{
+    border: solid 2px rgb(27, 128, 2);
+    border-radius: 5px;
+    color: rgb(27, 128, 2);
+    font-weight: bold;
+    padding: 5px;
+    margin: 10px;
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.titleForm {
+    font-weight: bold;
+    border-bottom: 3px solid #e8dbb1;
 }
 
 /* ---------------------------------------------------------------

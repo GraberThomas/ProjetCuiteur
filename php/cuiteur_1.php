@@ -5,7 +5,7 @@ ob_start(); //démarre la bufferisation
 require_once 'bibli_generale.php';
 require_once 'bibli_cuiteur.php';
 
-$bd = em_bd_connect();
+$bd = gh_bd_connect();
 
 $sql = 'SELECT  DISTINCT auteur.usID AS autID, auteur.usPseudo AS autPseudo, auteur.usNom AS autNom, auteur.usAvecPhoto AS autPhoto, 
                 blTexte, blDate, blHeure,
@@ -20,18 +20,18 @@ $sql = 'SELECT  DISTINCT auteur.usID AS autID, auteur.usPseudo AS autPseudo, aut
         OR      meIDUser = 23
         ORDER BY blID DESC';
 
-$res = em_bd_send_request($bd, $sql);
+$res = gh_bd_send_request($bd, $sql);
 
-em_aff_debut('Cuiteur', '../styles/cuiteur.css');
-em_aff_entete();
-em_aff_infos();
+gh_aff_debut('Cuiteur', '../styles/cuiteur.css');
+gh_aff_entete();
+gh_aff_infos();
 echo '<ul>';
 
 if (mysqli_num_rows($res) == 0){
     echo '<li>Votre fil de blablas est vide</li>';
 }
 else{
-    em_aff_blablas($res);
+    gh_aff_blablas($res);
 }
 
 echo '</ul>';
@@ -40,8 +40,8 @@ echo '</ul>';
 mysqli_free_result($res);
 mysqli_close($bd);
 
-em_aff_pied();
-em_aff_fin();
+gh_aff_pied();
+gh_aff_fin();
 
 // facultatif car fait automatiquement par PHP
 ob_end_flush();

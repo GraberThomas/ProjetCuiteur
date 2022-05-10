@@ -26,7 +26,7 @@
  *
  * @param array    $err    Informations utiles pour le débogage
  */
-function em_bd_erreur_exit(array $err):void {
+function gh_bd_erreur_exit(array $err):void {
     ob_end_clean(); // Suppression de tout ce qui a pu être déja généré
 
     echo    '<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">',
@@ -85,7 +85,7 @@ function em_bd_erreur_exit(array $err):void {
  *
  *  @return mysqli  objet connecteur à la base de données
  */
-function em_bd_connect(): mysqli {
+function gh_bd_connect(): mysqli {
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
     try{
         $conn = mysqli_connect(BD_SERVER, BD_USER, BD_PASS, BD_NAME);
@@ -99,7 +99,7 @@ function em_bd_connect(): mysqli {
                                                     ."\n".'BD_USER : '. BD_USER
                                                     ."\n".'BD_PASS : '. BD_PASS
                                                     ."\n".'BD_NAME : '. BD_NAME);
-        em_bd_erreur_exit($err); // ==> ARRET DU SCRIPT
+        gh_bd_erreur_exit($err); // ==> ARRET DU SCRIPT
     }
     try{
         //mysqli_set_charset() définit le jeu de caractères par défaut à utiliser lors de l'envoi
@@ -112,7 +112,7 @@ function em_bd_connect(): mysqli {
         $err['code'] = $e->getCode();
         $err['message'] = $e->getMessage();
         $err['appels'] = $e->getTraceAsString();
-        em_bd_erreur_exit($err); // ==> ARRET DU SCRIPT
+        gh_bd_erreur_exit($err); // ==> ARRET DU SCRIPT
     }
 }
 
@@ -129,7 +129,7 @@ function em_bd_connect(): mysqli {
  * @param   string              $sql    Requête SQL
  * @return  mysqli_result|bool          Résultat de la requête
  */
-function em_bd_send_request(mysqli $bd, string $sql): mysqli_result|bool {
+function gh_bd_send_request(mysqli $bd, string $sql): mysqli_result|bool {
     try{
         return mysqli_query($bd, $sql);
     }
@@ -139,7 +139,7 @@ function em_bd_send_request(mysqli $bd, string $sql): mysqli_result|bool {
         $err['message'] = $e->getMessage();
         $err['appels'] = $e->getTraceAsString();
         $err['autres'] = array('Requête' => $sql);
-        em_bd_erreur_exit($err);    // ==> ARRET DU SCRIPT
+        gh_bd_erreur_exit($err);    // ==> ARRET DU SCRIPT
     }
 }
 
@@ -150,7 +150,7 @@ function em_bd_send_request(mysqli $bd, string $sql): mysqli_result|bool {
  *  @param  string  $titre  Titre de la page
  *  @param  ?string $css    Chemin relatif vers la feuille de style CSS.
  */
-function em_aff_debut(string $titre, ?string $css = null):void {
+function gh_aff_debut(string $titre, ?string $css = null):void {
     $css = ($css) ? "<link rel='stylesheet' type='text/css' href='$css'>" : '';
     echo 
         '<!DOCTYPE html>',
@@ -168,7 +168,7 @@ function em_aff_debut(string $titre, ?string $css = null):void {
 /**
  *  Fonction affichant la fin du code HTML d'une page.
  */
-function em_aff_fin():void {
+function gh_aff_fin():void {
     echo '</body></html>';
 }
 
@@ -182,7 +182,7 @@ function em_aff_fin():void {
 * @param  int       $amj    La date sous la forme aaaammjj
 * @return string            La date sous la forme jj mois aaaa (1 janvier 2000)
 */
-function em_amj_clair(int $amj):string {
+function gh_amj_clair(int $amj):string {
     $mois = array('', ' janvier ', ' février ', ' mars ', ' avril ', ' mai ', ' juin',
                 ' juillet ', ' aôut ', ' septembre ', ' octobre ', ' novembre ', ' décembre ');
                 
@@ -200,11 +200,11 @@ function em_amj_clair(int $amj):string {
 * @param    string  $heure  L'heure sous la forme HH:MM:SS
 * @return   string          L'heure sous la forme HHhMMmn (9h08mn)
 */
-function em_heure_clair(string $heure):string {
+function gh_heure_clair(string $heure):string {
     
     $h = (int)substr($heure, 0, 2);
     $m = substr($heure, 3, 2);
-    if (! em_est_entier($m)){ //$heure est une chaîne provenant de la BdD, donc méfiance
+    if (! gh_est_entier($m)){ //$heure est une chaîne provenant de la BdD, donc méfiance
         $m = '00';
     }
     return "{$h}h{$m}mn";
@@ -225,7 +225,7 @@ function em_heure_clair(string $heure):string {
 * @param  ?string   $title              info bulle
 * @return string                        Le code HTML du lien
 */
-function em_html_a(string $url, string $support_lien, ?string $query_string_nom = null, ?string $query_string_val = null, ?string $title = null):string{
+function gh_html_a(string $url, string $support_lien, ?string $query_string_nom = null, ?string $query_string_val = null, ?string $title = null):string{
     $title = $title ? " title='$title'" : '';
     $query_string = $query_string_nom ? "?{$query_string_nom}=".urlencode($query_string_val) : '';
 
@@ -239,7 +239,7 @@ function em_html_a(string $url, string $support_lien, ?string $query_string_nom 
  * @param   mixed    $x  valeur à tester
  * @return  bool     TRUE si entier, FALSE sinon
  */
-function em_est_entier(mixed $x):bool {
+function gh_est_entier(mixed $x):bool {
     return is_numeric($x) && ($x == (int) $x);
 }
 
@@ -261,11 +261,11 @@ function em_est_entier(mixed $x):bool {
  *  @param  array|string  $content   la chaine à protéger ou un tableau contenant des chaines à protéger 
  *  @return array|string             la chaîne protégée ou le tableau
  */
-function em_html_proteger_sortie(array|string $content): array|string {
+function gh_html_proteger_sortie(array|string $content): array|string {
     if (is_array($content)) {
         foreach ($content as &$value) {
             if (is_array($value) || is_string($value)){
-                $value = em_html_proteger_sortie($value);
+                $value = gh_html_proteger_sortie($value);
             }
         }
         unset ($value); // à ne pas oublier (de façon générale)
@@ -294,11 +294,11 @@ function em_html_proteger_sortie(array|string $content): array|string {
 *  @param    array|string   $content    la chaine à protéger ou un tableau contenant des chaines à protéger 
 *  @return   array|string               la chaîne protégée ou le tableau
 */  
-function em_bd_proteger_entree(mysqli $bd, array|string $content): array|string {
+function gh_bd_proteger_entree(mysqli $bd, array|string $content): array|string {
     if (is_array($content)) {
         foreach ($content as &$value) {
             if (is_array($value) || is_string($value)){
-                $value = em_bd_proteger_entree($bd,$value);
+                $value = gh_bd_proteger_entree($bd,$value);
             }
         }
         unset ($value); // à ne pas oublier (de façon générale)
@@ -335,7 +335,7 @@ function em_bd_proteger_entree(mysqli $bd, array|string $content): array|string 
 * @param array     $cles_facultatives tableau contenant les clés facultatives
 * @return bool     true si les paramètres sont corrects, false sinon
 */
-function em_parametres_controle(string $tab_global, array $cles_obligatoires, array $cles_facultatives = array()): bool{
+function gh_parametres_controle(string $tab_global, array $cles_obligatoires, array $cles_facultatives = array()): bool{
     $x = strtolower($tab_global) == 'post' ? $_POST : $_GET;
 
     $x = array_keys($x);
@@ -363,7 +363,7 @@ function em_parametres_controle(string $tab_global, array $cles_obligatoires, ar
  * @param array     $attributs      Un tableau associatif donnant les attributs de l'input sous la forme nom => valeur
  * @param string    $prefix_id      Le préfixe utilisé pour l'id de l'input, ce qui donne un id égal à {$prefix_id}{$attributs['name']}
  */
-function em_aff_ligne_input(string $libelle, array $attributs = array(), string $prefix_id = 'text'): void{
+function gh_aff_ligne_input(string $libelle, array $attributs = array(), string $prefix_id = 'text'): void{
     echo    '<tr>', 
                 '<td><label for="', $prefix_id, $attributs['name'], '">', $libelle, '</label></td>',
                 '<td><input id="', $prefix_id, $attributs['name'], '"'; 

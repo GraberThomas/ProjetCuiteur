@@ -6,7 +6,7 @@
     require_once './php/bibli_cuiteur.php';
 
     // If user is authentificated, we redirect him to Cuiteur.php
-    if (em_est_authentifie()){
+    if (gh_est_authentifie()){
         header('Location: ./php/cuiteur.php');
         exit;
     }
@@ -16,15 +16,15 @@
     /*-----------------------------------------------------------------------------
     - Generate HTML page
     ------------------------------------------------------------------------------*/
-    em_aff_debut('Cuiteur | Connexion', './styles/cuiteur.css');
-    em_aff_entete('Connectez-vous', false);
-    em_aff_infos(false);
+    gh_aff_debut('Cuiteur | Connexion', './styles/cuiteur.css');
+    gh_aff_entete('Connectez-vous', false);
+    gh_aff_infos(false);
     gh_aff_formulaire($er);
 
-    echo '<p>Pas encore de compte ? <a href="./php/inscription.php">Inscrivez-vous</a> sans tarder!<br>
-            Vous hésitez à vous inscrire ? Laissez-vous séduire par une <a href="./html/presentation.html">présentation</a> des possibilités de Cuiteur.</p>';
-    em_aff_pied();
-    em_aff_fin();
+    echo '<p>Pas encore de compte ? <a href="./php/inscription.php">Inscrivez-vous</a> sans tarder!<br>',
+            'Vous hésitez à vous inscrire ? Laissez-vous séduire par une <a href="./html/presentation.html">présentation</a> des possibilités de Cuiteur.</p>';
+    gh_aff_pied();
+    gh_aff_fin();
 
     ob_end_flush();
 
@@ -44,8 +44,8 @@
         }
         echo        '<table>';
 
-        em_aff_ligne_input( 'Pseudo :', array('type' => 'text', 'name' => 'pseudo', 'value' => '', 'required' => null));
-        em_aff_ligne_input('Mot de passe :', array('type' => 'password', 'name' => 'passe', 'value' => '', 'required' => null));
+        gh_aff_ligne_input( 'Pseudo :', array('type' => 'text', 'name' => 'pseudo', 'value' => '', 'required' => null));
+        gh_aff_ligne_input('Mot de passe :', array('type' => 'password', 'name' => 'passe', 'value' => '', 'required' => null));
 
         echo 
             '<tr>',
@@ -69,8 +69,8 @@
      * @return bool    Returns false if errors are found
      */
     function gh_valider_connexion(): bool {
-        if( !em_parametres_controle('post', array('pseudo', 'passe', 'btnConnexion'))) {
-            em_session_exit();   
+        if( !gh_parametres_controle('post', array('pseudo', 'passe', 'btnConnexion'))) {
+            gh_session_exit();   
         }
 
         foreach($_POST as &$val){
@@ -91,10 +91,10 @@
             return false;
         }
         
-        $db = em_bd_connect();
-        $pseudo = em_bd_proteger_entree($db, $_POST['pseudo']);
+        $db = gh_bd_connect();
+        $pseudo = gh_bd_proteger_entree($db, $_POST['pseudo']);
         $sql = "SELECT * FROM users WHERE usPseudo = '$pseudo'";
-        $result = em_bd_send_request($db, $sql);
+        $result = gh_bd_send_request($db, $sql);
         if(mysqli_num_rows($result) == 0){
             return false;
         }

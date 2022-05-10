@@ -41,6 +41,8 @@ define('LMAX_PASSWORD', 20);
 define('AGE_MIN', 18);
 define('AGE_MAX', 120);
 
+define("NUMBER_CUIT_DISPLAY",4);
+
 
 //_______________________________________________________________
 /**
@@ -49,7 +51,7 @@ define('AGE_MAX', 120);
  * @param ?string    $titre  Titre de l'entete (si null, affichage de l'entete de cuiteur.php avec le formulaire)
  * @param bool       $with_buttons   If true, show buttons (deconnection, profile modification, ...) => default true
  */
-function em_aff_entete(?string $titre = null, bool $connected=true):void{
+function gh_aff_entete(?string $titre = null, bool $connected=true):void{
     echo '<div id="bcContenu">';
     if($connected === true){
         echo    '<header id="header_connected">';
@@ -57,10 +59,10 @@ function em_aff_entete(?string $titre = null, bool $connected=true):void{
         echo '<header id="header_disconnected">';
     }
     if($connected === true){
-        echo '<a href="../index.php" title="Se déconnecter de cuiteur"></a>',
+        echo '<a href="../deconnexion.php" title="Se déconnecter de cuiteur"></a>',
             '<a href="../index.php" title="Ma page d\'accueil"></a>',
-            '<a href="../index.php" title="Rechercher des personnes à suivre"></a>',
-            '<a href="../index.php" title="Modifier mes informations personnelles"></a>';
+            '<a href="../recherche.php" title="Rechercher des personnes à suivre"></a>',
+            '<a href="../compte.php" title="Modifier mes informations personnelles"></a>';
     }
     if ($titre === null){
         echo    '<form action="../index.php" method="POST">',
@@ -80,7 +82,7 @@ function em_aff_entete(?string $titre = null, bool $connected=true):void{
  *
  * @param bool    $connecte  true si l'utilisateur courant s'est authentifié, false sinon
  */
-function em_aff_infos(bool $connecte = true):void{
+function gh_aff_infos(bool $connecte = true):void{
     echo '<aside>';
     if ($connecte){
         echo
@@ -124,7 +126,7 @@ function em_aff_infos(bool $connecte = true):void{
  * Génération et affichage du pied de page
  *
  */
-function em_aff_pied(): void{
+function gh_aff_pied(): void{
     echo    '</main>',
             '<footer>',
                 '<a href="../index.php">A propos</a>',
@@ -148,7 +150,7 @@ function em_aff_pied(): void{
 *
 * @param mysqli_result  $r       Objet permettant l'accès aux résultats de la requête SELECT
 */
-function em_aff_blablas(mysqli_result $r): void {
+function gh_aff_blablas(mysqli_result $r): void {
     while ($t = mysqli_fetch_assoc($r)) {
         if ($t['oriID'] === null){
             $id_orig = $t['autID'];
@@ -165,15 +167,15 @@ function em_aff_blablas(mysqli_result $r): void {
         echo    '<li>', 
                     '<img src="../', ($photo == 1 ? "upload/$id_orig.jpg" : 'images/anonyme.jpg'), 
                     '" class="imgAuteur" alt="photo de l\'auteur">',
-                    em_html_a('utilisateur.php', '<strong>'.em_html_proteger_sortie($pseudo_orig).'</strong>','id', $id_orig, 'Voir mes infos'), 
-                    ' ', em_html_proteger_sortie($nom_orig),
+                    gh_html_a('utilisateur.php', '<strong>'.gh_html_proteger_sortie($pseudo_orig).'</strong>','id', $id_orig, 'Voir mes infos'), 
+                    ' ', gh_html_proteger_sortie($nom_orig),
                     ($t['oriID'] !== null ? ', recuité par '
-                                            .em_html_a( 'utilisateur.php','<strong>'.em_html_proteger_sortie($t['autPseudo']).'</strong>',
+                                            .gh_html_a( 'utilisateur.php','<strong>'.gh_html_proteger_sortie($t['autPseudo']).'</strong>',
                                                         'id', $t['autID'], 'Voir mes infos') : ''),
                     '<br>',
-                    em_html_proteger_sortie($t['blTexte']),
+                    gh_html_proteger_sortie($t['blTexte']),
                     '<p class="finMessage">',
-                    em_amj_clair($t['blDate']), ' à ', em_heure_clair($t['blHeure']),
+                    gh_amj_clair($t['blDate']), ' à ', gh_heure_clair($t['blHeure']),
                     '<a href="../index.php">Répondre</a> <a href="../index.php">Recuiter</a></p>',
                 '</li>';
     }
@@ -186,7 +188,7 @@ function em_aff_blablas(mysqli_result $r): void {
 * @global array    $_SESSION 
 * @return bool     true si l'utilisateur est authentifié, false sinon
 */
-function em_est_authentifie(): bool {
+function gh_est_authentifie(): bool {
     return  isset($_SESSION['usID']);
 }
 
@@ -206,7 +208,7 @@ function em_est_authentifie(): bool {
  * 
  * @param string    URL de la page vers laquelle l'utilisateur est redirigé
  */
-function em_session_exit(string $page = '../index.php'):void {
+function gh_session_exit(string $page = '../index.php'):void {
     session_destroy();
     session_unset();
     $cookieParams = session_get_cookie_params();

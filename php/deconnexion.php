@@ -2,8 +2,8 @@
 
 require_once('./bibli_cuiteur.php');
 
-// démarrage de la session, pas besoin de démarrer la bufferisation des sorties
+// dï¿½marrage de la session, pas besoin de dï¿½marrer la bufferisation des sorties
 session_start();
 
-em_session_exit();
+gh_session_exit();
 ?>

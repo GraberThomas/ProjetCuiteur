@@ -5,7 +5,7 @@ ob_start(); //démarre la bufferisation
 require_once 'bibli_generale.php';
 require_once 'bibli_cuiteur.php';
 
-$bd = em_bd_connect();
+$bd = gh_bd_connect();
 
 $sql = 'SELECT  auteur.usID AS autID, auteur.usPseudo AS autPseudo, auteur.usNom AS autNom, auteur.usAvecPhoto AS autPhoto, 
                 blTexte, blDate, blHeure,
@@ -16,16 +16,16 @@ $sql = 'SELECT  auteur.usID AS autID, auteur.usPseudo AS autPseudo, auteur.usNom
         WHERE auteur.usID = 2
         ORDER BY blID DESC';
 
-$res = em_bd_send_request($bd, $sql);
+$res = gh_bd_send_request($bd, $sql);
 
-em_aff_debut('Cuiteur | Blablas', '../styles/cuiteur.css');
+gh_aff_debut('Cuiteur | Blablas', '../styles/cuiteur.css');
 
 // Récupération des données et encapsulation dans du code HTML envoyé au navigateur
 $i = 0;
 while ($t = mysqli_fetch_assoc($res)) {
     if ($i == 0){
-        em_aff_entete(em_html_proteger_sortie("Les blablas de {$t['autPseudo']}"));
-        em_aff_infos();
+        gh_aff_entete(gh_html_proteger_sortie("Les blablas de {$t['autPseudo']}"));
+        gh_aff_infos();
         echo '<ul>';
     }
     if ($t['oriID'] === null){
@@ -43,15 +43,15 @@ while ($t = mysqli_fetch_assoc($res)) {
     echo    '<li>', 
                 '<img src="../', ($photo == 1 ? "upload/$id_orig.jpg" : 'images/anonyme.jpg'), 
                 '" class="imgAuteur" alt="photo de l\'auteur">',
-                em_html_a('utilisateur.php','<strong>'.em_html_proteger_sortie($pseudo_orig).'</strong>','id', $id_orig, 'Voir mes infos'), 
-                ' ', em_html_proteger_sortie($nom_orig),
+                gh_html_a('utilisateur.php','<strong>'.gh_html_proteger_sortie($pseudo_orig).'</strong>','id', $id_orig, 'Voir mes infos'), 
+                ' ', gh_html_proteger_sortie($nom_orig),
                 ($t['oriID'] !== null ? ', recuité par '
-                                        .em_html_a( 'utilisateur.php','<strong>'.em_html_proteger_sortie($t['autPseudo']).'</strong>',
+                                        .gh_html_a( 'utilisateur.php','<strong>'.gh_html_proteger_sortie($t['autPseudo']).'</strong>',
                                                     'id', $t['autID'], 'Voir mes infos') : ''),
                 '<br>',
-                em_html_proteger_sortie($t['blTexte']),
+                gh_html_proteger_sortie($t['blTexte']),
                 '<p class="finMessage">',
-                em_amj_clair($t['blDate']), ' à ', em_heure_clair($t['blHeure']),
+                gh_amj_clair($t['blDate']), ' à ', gh_heure_clair($t['blHeure']),
                 '<a href="../index.php">Répondre</a> <a href="../index.php">Recuiter</a></p>',
             '</li>';
     ++$i;
@@ -63,8 +63,8 @@ echo '</ul>';
 mysqli_free_result($res);
 mysqli_close($bd);
 
-em_aff_pied();
-em_aff_fin();
+gh_aff_pied();
+gh_aff_fin();
 
 // facultatif car fait automatiquement par PHP
 ob_end_flush();

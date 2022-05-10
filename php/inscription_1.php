@@ -5,7 +5,7 @@
 require_once 'bibli_generale.php';
 
 
-em_aff_debut('Cuiteur | Inscription');
+gh_aff_debut('Cuiteur | Inscription');
 
 echo '<hr>';
 
@@ -24,7 +24,7 @@ echo '<hr>';
 echo '<pre>', print_r($_POST, true), '</pre>';
 
 
-em_aff_fin();
+gh_aff_fin();
 
 ob_end_flush();
 

@@ -4,11 +4,11 @@ ob_start(); //démarre la bufferisation
 require_once 'bibli_generale.php';
 require_once 'bibli_cuiteur.php';
 
-em_aff_debut('Cuiteur | Inscription');
+gh_aff_debut('Cuiteur | Inscription');
 
 echo '<h1>Réception du formulaire<br>Inscription utilisateur</h1>';
 
-if( !em_parametres_controle('post', array('pseudo', 'email', 'nomprenom', 'naissance', 
+if( !gh_parametres_controle('post', array('pseudo', 'email', 'nomprenom', 'naissance', 
                                               'passe1', 'passe2', 'btnSInscrire'))) {
     header('Location: ../index.php'); 
     exit();
@@ -103,13 +103,13 @@ else{
 if (count($erreurs) == 0) {
     // vérification de l'unicité du pseudo 
     // (uniquement si pas d'autres erreurs, parce que la connection à la base de données est consommatrice de ressources)
-    $bd = em_bd_connect();
+    $bd = gh_bd_connect();
 
     // pas utile, car le pseudo a déjà été vérifié, mais tellement plus sécurisant...
-    $pseudo = em_bd_proteger_entree($bd, $_POST['pseudo']);
+    $pseudo = gh_bd_proteger_entree($bd, $_POST['pseudo']);
     $sql = "SELECT usID FROM users WHERE usPseudo = '$pseudo'"; 
 
-    $res = em_bd_send_request($bd, $sql);
+    $res = gh_bd_send_request($bd, $sql);
     
     if (mysqli_num_rows($res) != 0) {
         $erreurs[] = 'Le pseudo spécifié est déjà utilisé.';
@@ -132,7 +132,7 @@ else{
     echo '<p>Aucune erreur de saisie</p>';
 }
 
-em_aff_fin();
+gh_aff_fin();
 
 ob_end_flush();
 

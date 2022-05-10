@@ -7,19 +7,19 @@ require_once 'bibli_generale.php';
 require_once 'bibli_cuiteur.php';
 
 // if user is not authenticated, redirect to index.php
-if (! em_est_authentifie()){
+if (! gh_est_authentifie()){
     header('Location: ../index.php');
     exit;
 }
 
-$db = em_bd_connect();
+$db = gh_bd_connect();
 
 /*------------------------------------------------------------------------------
 - Get user's data (current user if id is not set or invalid)
 ------------------------------------------------------------------------------*/
 $id = isset($_GET['id']) ? $_GET['id'] : $_SESSION['usID'];
 
-if (isset($_GET['id']) && (! em_est_entier(($_GET['id'])) || $_GET['id'] <= 0)){
+if (isset($_GET['id']) && (! gh_est_entier(($_GET['id'])) || $_GET['id'] <= 0)){
     $id = $_SESSION['usID'];
 }
 
@@ -27,7 +27,7 @@ $sqlUserData = "SELECT users.*
                 FROM users
                 WHERE users.usID = $id";
 
-$userData = mysqli_fetch_assoc(em_bd_send_request($GLOBALS['db'], $sqlUserData));
+$userData = mysqli_fetch_assoc(gh_bd_send_request($GLOBALS['db'], $sqlUserData));
 
 $sqlStats = "SELECT COUNT(*) AS nbBlablas
              FROM blablas
@@ -36,7 +36,7 @@ $sqlStats = "SELECT COUNT(*) AS nbBlablas
              SELECT COUNT(*) AS nbMentions
              FROM mentions
              WHERE mentions.meIDUser = $id";
-$stats = mysqli_fetch_assoc(em_bd_send_request($GLOBALS['db'], $sqlStats));
+$stats = mysqli_fetch_assoc(gh_bd_send_request($GLOBALS['db'], $sqlStats));
 
 echo '<pre>';
 print_r($userData);
@@ -49,23 +49,23 @@ if (! $userData){
     $sqlUserData = "SELECT *
                FROM users
                WHERE usId = ". $_SESSION['usID'];
-    $userData = mysqli_fetch_assoc(em_bd_send_request($GLOBALS['db'], $sqlUserData));
+    $userData = mysqli_fetch_assoc(gh_bd_send_request($GLOBALS['db'], $sqlUserData));
 }
 
-$userData = em_html_proteger_sortie($userData);
+$userData = gh_html_proteger_sortie($userData);
 
 /*------------------------------------------------------------------------------
 - Generating the html code for the page
 ------------------------------------------------------------------------------*/
-em_aff_debut('Cuiteur | Profil de '. $userData['usPseudo'], '../styles/cuiteur.css');
+gh_aff_debut('Cuiteur | Profil de '. $userData['usPseudo'], '../styles/cuiteur.css');
 
-em_aff_entete('Le profil de '. $userData['usPseudo']);
-em_aff_infos(true);
+gh_aff_entete('Le profil de '. $userData['usPseudo']);
+gh_aff_infos(true);
 
 gh_aff_user_info($userData);
 
-em_aff_pied();
-em_aff_fin();
+gh_aff_pied();
+gh_aff_fin();
 
 // facultatif car fait automatiquement par PHP
 ob_end_flush();
@@ -84,10 +84,10 @@ mysqli_close($db);
         $photoProfilPath = $userData['usAvecPhoto'] == '1' ? '../upload/'. $userData['usID'] .'.jpg' : '../images/anonyme.jpg';
         echo '<p>',
                 '<img src="', $photoProfilPath, '" alt="Photo de profil" class="photoProfil">',
-                em_html_a('./utilisateur.php?id='. $userData['usID'], $userData['usPseudo']), ' ', $userData['usNom'],
-                em_html_a('./blablas.php?id='. $userData['usID'], $userData['nbBlablas'] .' blabla'. ($userData['nbBlablas'] > 1 ? 's' : '')),
-                em_html_a('./mentions.php?id='. $userData['usID'], $userData['nbMentions'] .' mention'. ($userData['nbMentions'] > 1 ? 's' : '')),
-                em_html_a('./abonnes.php?id='. $userData['usID'], $userData['nbAbonnes'] .' abonnement'. ($userData['nbAbonnes'] > 1 ? 's' : '')),
-                em_html_a('./abonnements.php?id='. $userData['usID'], $userData['nbAbonnements'] .' abonné'. ($userData['nbAbonnements'] > 1 ? 's' : '')),
+                gh_html_a('./utilisateur.php?id='. $userData['usID'], $userData['usPseudo']), ' ', $userData['usNom'],
+                gh_html_a('./blablas.php?id='. $userData['usID'], $userData['nbBlablas'] .' blabla'. ($userData['nbBlablas'] > 1 ? 's' : '')),
+                gh_html_a('./mentions.php?id='. $userData['usID'], $userData['nbMentions'] .' mention'. ($userData['nbMentions'] > 1 ? 's' : '')),
+                gh_html_a('./abonnes.php?id='. $userData['usID'], $userData['nbAbonnes'] .' abonnement'. ($userData['nbAbonnes'] > 1 ? 's' : '')),
+                gh_html_a('./abonnements.php?id='. $userData['usID'], $userData['nbAbonnements'] .' abonné'. ($userData['nbAbonnements'] > 1 ? 's' : '')),
              '</p>';
     }

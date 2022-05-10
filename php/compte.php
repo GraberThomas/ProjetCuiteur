@@ -9,12 +9,12 @@ require_once 'bibli_generale.php';
 require_once 'bibli_cuiteur.php';
 
 // if user is not authenticated, redirect to index.php
-if (! em_est_authentifie()){
+if (! gh_est_authentifie()){
     header('Location: ../index.php');
     exit;
 }
 
-$db = em_bd_connect();
+$db = gh_bd_connect();
 
 /*------------------------------------------------------------------------------
 - Get user's data
@@ -24,8 +24,8 @@ $sqlUserData = 'SELECT usNom, usDateNaissance, usVille, usBio, usMail, usWeb, us
                 FROM users
                 WHERE usID = ' . $_SESSION['usID'];
 
-$userData = mysqli_fetch_assoc(em_bd_send_request($GLOBALS['db'], $sqlUserData));
-$userData = em_html_proteger_sortie($userData);
+$userData = mysqli_fetch_assoc(gh_bd_send_request($GLOBALS['db'], $sqlUserData));
+$userData = gh_html_proteger_sortie($userData);
 
 $erPersonalInfo = isset($_POST['btnModifyPersonalInfo']) ? gh_traitement_infos_perso() : array();
 $erCuiteurAccountInfo = isset($_POST['btnModifyCuiteurAccountInfo']) ? gh_traitement_infos_compte_cuiteur() : array();
@@ -35,10 +35,10 @@ $erCuiteurAccountSettings = isset($_POST['btnModifyCuiteurAccountSettings']) ? g
 - Generating the html code for the page
 ------------------------------------------------------------------------------*/
 
-em_aff_debut('Cuiteur | Compte', '../styles/cuiteur.css');
+gh_aff_debut('Cuiteur | Compte', '../styles/cuiteur.css');
 
-em_aff_entete('Paramètres de mon compte', true);
-em_aff_infos(true);
+gh_aff_entete('Paramètres de mon compte', true);
+gh_aff_infos(true);
 
 echo '<p>Cette page vous permet de modifier les informations relatives à votre compte.</p>',
      '<br>';
@@ -47,8 +47,8 @@ gh_aff_formulaire_infos_perso($erPersonalInfo);
 gh_aff_formulaire_infos_compte_cuiteur($erCuiteurAccountInfo);
 gh_aff_formulaire_parametres_compte_cuiteur($erCuiteurAccountSettings);
 
-em_aff_pied();
-em_aff_fin();
+gh_aff_pied();
+gh_aff_fin();
 
 // facultatif car fait automatiquement par PHP
 ob_end_flush();
@@ -73,7 +73,7 @@ mysqli_close($db);
         // If there are errors, display form with sent values
         // Else, retrieve the values from database and display form with them
         if (isset($_POST['btnModifyPersonalInfo'])) {
-            $values = em_html_proteger_sortie($_POST);
+            $values = gh_html_proteger_sortie($_POST);
         }
         else {
             $values = $GLOBALS['userData'];
@@ -98,9 +98,9 @@ mysqli_close($db);
         echo '<form method="post" action="compte.php">',
                 '<table>';
 
-        em_aff_ligne_input('Nom et prénom :', array('type' => 'text', 'name' => 'usNom', 'value' => $values['usNom'], 'required' => null));
-        em_aff_ligne_input('Date de naissance :', array('type' => 'date', 'name' => 'usDateNaissance', 'value' => $values['usDateNaissance'], 'required' => null));
-        em_aff_ligne_input('Ville :', array('type' => 'text', 'name' => 'usVille', 'value' => $values['usVille']));
+        gh_aff_ligne_input('Nom et prénom :', array('type' => 'text', 'name' => 'usNom', 'value' => $values['usNom'], 'required' => null));
+        gh_aff_ligne_input('Date de naissance :', array('type' => 'date', 'name' => 'usDateNaissance', 'value' => $values['usDateNaissance'], 'required' => null));
+        gh_aff_ligne_input('Ville :', array('type' => 'text', 'name' => 'usVille', 'value' => $values['usVille']));
                 echo '<tr>',
                         '<td>',
                             '<label for="usBio">Mini-bio :</label>',
@@ -132,8 +132,8 @@ mysqli_close($db);
  * @return array    associative array containing the errors if any
  */
 function gh_traitement_infos_perso(): array {
-    if( !em_parametres_controle('post', array('usNom', 'usDateNaissance', 'btnModifyPersonalInfo'), array('usVille', 'usBio'))) {
-        em_session_exit();   
+    if( !gh_parametres_controle('post', array('usNom', 'usDateNaissance', 'btnModifyPersonalInfo'), array('usVille', 'usBio'))) {
+        gh_session_exit();   
     }
     
     foreach($_POST as &$val){
@@ -169,9 +169,9 @@ function gh_traitement_infos_perso(): array {
         return $errors;    
     }
     // no error ==> modify user's data in the database
-    $name = em_bd_proteger_entree($GLOBALS['db'], $_POST['usNom']);
-    $city = em_bd_proteger_entree($GLOBALS['db'], $_POST['usVille']);
-    $bio = em_bd_proteger_entree($GLOBALS['db'], $_POST['usBio']);
+    $name = gh_bd_proteger_entree($GLOBALS['db'], $_POST['usNom']);
+    $city = gh_bd_proteger_entree($GLOBALS['db'], $_POST['usVille']);
+    $bio = gh_bd_proteger_entree($GLOBALS['db'], $_POST['usBio']);
 
     list($day, $month, $year) = explode('-', $_POST['usDateNaissance']);
     $yyyymmdd = $year*10000  + $month*100 + $day;
@@ -184,7 +184,7 @@ function gh_traitement_infos_perso(): array {
             usBio = '$bio'
             WHERE usID = '$_SESSION[usID]'"; 
     
-    em_bd_send_request($GLOBALS['db'], $sql);
+    gh_bd_send_request($GLOBALS['db'], $sql);
     return array();
 }
 
@@ -200,7 +200,7 @@ function gh_traitement_infos_perso(): array {
         // If there are errors, display form with sent values
         // Else, retrieve the values from database and display form with them
         if (isset($_POST['btnModifyCuiteurAccountInfo'])) {
-            $values = em_html_proteger_sortie($_POST);
+            $values = gh_html_proteger_sortie($_POST);
         }
         else {
             $values = $GLOBALS['userData'];
@@ -220,8 +220,8 @@ function gh_traitement_infos_perso(): array {
         echo '<form method="post" action="compte.php">',
                 '<table>';
 
-        em_aff_ligne_input('Adresse email :', array('type' => 'email', 'name' => 'usMail', 'value' => $values['usMail'], 'required' => null));
-        em_aff_ligne_input('Site web :', array('type' => 'text', 'name' => 'usWeb', 'value' => $values['usWeb']));
+        gh_aff_ligne_input('Adresse email :', array('type' => 'email', 'name' => 'usMail', 'value' => $values['usMail'], 'required' => null));
+        gh_aff_ligne_input('Site web :', array('type' => 'text', 'name' => 'usWeb', 'value' => $values['usWeb']));
             echo '<tr>',
                     '<td colspan="2">',
                         '<input type="submit" name="btnModifyCuiteurAccountInfo" value="Valider">',
@@ -246,8 +246,8 @@ function gh_traitement_infos_perso(): array {
  */
 function gh_traitement_infos_compte_cuiteur(): array {
     
-    if( !em_parametres_controle('post', array('usMail', 'btnModifyCuiteurAccountInfo'), array('usWeb'))) {
-        em_session_exit();   
+    if( !gh_parametres_controle('post', array('usMail', 'btnModifyCuiteurAccountInfo'), array('usWeb'))) {
+        gh_session_exit();   
     }
     
     foreach($_POST as &$val){
@@ -269,15 +269,15 @@ function gh_traitement_infos_compte_cuiteur(): array {
         return $errors;    
     }
     // no error ==> modify user's data in the database
-    $email = em_bd_proteger_entree($GLOBALS['db'], $_POST['usMail']);
-    $web = em_bd_proteger_entree($GLOBALS['db'], $_POST['usWeb']);
+    $email = gh_bd_proteger_entree($GLOBALS['db'], $_POST['usMail']);
+    $web = gh_bd_proteger_entree($GLOBALS['db'], $_POST['usWeb']);
 
     $sql = "UPDATE users
             SET usMail = '$email',
             usWeb = '$web'
             WHERE usID = '$_SESSION[usID]'";
     
-    em_bd_send_request($GLOBALS['db'], $sql);
+    gh_bd_send_request($GLOBALS['db'], $sql);
     return array();
 }
 
@@ -294,7 +294,7 @@ function gh_traitement_infos_compte_cuiteur(): array {
         // If there are errors, display form with sent values
         // Else, retrieve the values from database and display form with them
         if (isset($_POST['btnModifyCuiteurAccountSettings'])) {
-            $values = em_html_proteger_sortie($_POST);
+            $values = gh_html_proteger_sortie($_POST);
         }
         else {
             $values = $GLOBALS['userData'];
@@ -320,8 +320,8 @@ function gh_traitement_infos_compte_cuiteur(): array {
         echo '<form method="post" action="compte.php" enctype="multipart/form-data">',
                 '<table>';
 
-        em_aff_ligne_input('Changer le mot de passe :', array('type' => 'password', 'name' => 'usPasse', 'value' => ''));
-        em_aff_ligne_input('Répétez le mot de passe :', array('type' => 'password', 'name' => 'usPasse2', 'value' => ''));
+        gh_aff_ligne_input('Changer le mot de passe :', array('type' => 'password', 'name' => 'usPasse', 'value' => ''));
+        gh_aff_ligne_input('Répétez le mot de passe :', array('type' => 'password', 'name' => 'usPasse2', 'value' => ''));
                 echo '<tr>',
                         '<td>',
                             '<p>Votre photo actuelle :</p>',
@@ -378,8 +378,8 @@ function gh_traitement_infos_compte_cuiteur(): array {
  * @return array    associative array containing the errors if any
  */
 function gh_traitement_parametres_compte_cuiteur(): array {
-    if( !em_parametres_controle('post', array('usAvecPhoto', 'btnModifyCuiteurAccountSettings'), array('usPasse', 'usPasse2', 'usPhoto'))) {
-        em_session_exit();   
+    if( !gh_parametres_controle('post', array('usAvecPhoto', 'btnModifyCuiteurAccountSettings'), array('usPasse', 'usPasse2', 'usPhoto'))) {
+        gh_session_exit();   
     }
     
     foreach($_POST as &$val){
@@ -423,7 +423,7 @@ function gh_traitement_parametres_compte_cuiteur(): array {
     // no error ==> modify user's data in the database
     if ($_POST['usPasse'] !== '') {
         $passe = password_hash($_POST['usPasse'], PASSWORD_DEFAULT);
-        $passe = em_bd_proteger_entree($GLOBALS['db'], $passe);
+        $passe = gh_bd_proteger_entree($GLOBALS['db'], $passe);
     }
 
     $withPhoto = $_POST['usAvecPhoto'] == '1' ? '1' : '0';
@@ -436,7 +436,7 @@ function gh_traitement_parametres_compte_cuiteur(): array {
     }
     $sql .= " WHERE usID = '" . $_SESSION['usID'] . "'";
     
-    em_bd_send_request($GLOBALS['db'], $sql);
+    gh_bd_send_request($GLOBALS['db'], $sql);
 
     // Upload the photo if wanted, and new one is uploaded
     if ($_POST['usAvecPhoto'] == '1' && $_FILES['usPhoto']['size'] > 0) {

@@ -25,6 +25,7 @@ $sqlUserData = 'SELECT usNom, usDateNaissance, usVille, usBio, usMail, usWeb, us
                 WHERE usID = ' . $_SESSION['usID'];
 
 $userData = mysqli_fetch_assoc(em_bd_send_request($GLOBALS['db'], $sqlUserData));
+$userData = em_html_proteger_sortie($userData);
 
 $erPersonalInfo = isset($_POST['btnModifyPersonalInfo']) ? gh_traitement_infos_perso() : array();
 $erCuiteurAccountInfo = isset($_POST['btnModifyCuiteurAccountInfo']) ? gh_traitement_infos_compte_cuiteur() : array();

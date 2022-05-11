@@ -61,10 +61,10 @@ function gh_aff_entete(?string $titre = null, bool $connected=true):void{
         echo '<header id="header_disconnected">';
     }
     if($connected === true){
-        echo '<a href="../deconnexion.php" title="Se déconnecter de cuiteur"></a>',
+        echo '<a href="./deconnexion.php" title="Se déconnecter de cuiteur"></a>',
             '<a href="../index.php" title="Ma page d\'accueil"></a>',
-            '<a href="../recherche.php" title="Rechercher des personnes à suivre"></a>',
-            '<a href="../compte.php" title="Modifier mes informations personnelles"></a>';
+            '<a href="./recherche.php" title="Rechercher des personnes à suivre"></a>',
+            '<a href="./compte.php" title="Modifier mes informations personnelles"></a>';
     }
     if ($titre === null){
         echo    '<form action="../index.php" method="POST">',

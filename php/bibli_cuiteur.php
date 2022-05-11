@@ -335,3 +335,48 @@ function gh_verif_passe(string $passe1, string $passe2, array &$errors): void {
         $errors[] = 'Le mot de passe doit être constitué de '. LMIN_PASSWORD . ' à ' . LMAX_PASSWORD . ' caractères.';
     }
 }
+//_______________________________________________________________
+/**
+ * Get stats about a user (usPseudo, usNom, nbBlablas, nbMentions, nbAbonnes, nbAbonnements)
+ * 
+ * @param mysqli   $mysqli    MySQLi object
+ * @param int      $id        User's id
+ * @return array              User's info
+ */
+function gh_sql_get_user_stats(mysqli $db, int $id): array {
+    $sql = "SELECT usPseudo, usNom
+            FROM users
+            WHERE usId = $id
+            UNION ALL
+            SELECT COUNT(*), NULL
+            FROM blablas
+            WHERE blIDAuteur = $id
+            UNION ALL
+            SELECT COUNT(*), NULL
+            FROM mentions
+            WHERE meIDUser = $id
+            UNION ALL
+            SELECT COUNT(*), NULL
+            FROM estabonne
+            WHERE eaIDUser = $id
+            UNION ALL
+            SELECT COUNT(*), NULL
+            FROM estabonne
+            WHERE eaIDAbonne = $id";
+
+    $results = gh_bd_send_request($db, $sql);
+    $row = mysqli_fetch_array($results);
+    $data = array(
+        'usPseudo' => $row[0],
+        'usNom' => $row[1]
+    );
+    $row = mysqli_fetch_array($results);
+    $data['nbBlablas'] = $row[0];
+    $row = mysqli_fetch_array($results);
+    $data['nbMentions'] = $row[0];
+    $row = mysqli_fetch_array($results);
+    $data['nbAbonnes'] = $row[0];
+    $row = mysqli_fetch_array($results);
+    $data['nbAbonnements'] = $row[0];
+    return $data;
+}

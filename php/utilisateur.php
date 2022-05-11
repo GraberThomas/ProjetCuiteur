@@ -15,7 +15,7 @@ if (! gh_est_authentifie()){
 $db = gh_bd_connect();
 
 /*------------------------------------------------------------------------------
-- Get user's data (current user if id is not set or invalid)
+- Get user's stats and info (current user if id is not set or invalid)
 ------------------------------------------------------------------------------*/
 $id = isset($_GET['id']) ? $_GET['id'] : $_SESSION['usID'];
 
@@ -23,45 +23,24 @@ if (isset($_GET['id']) && (! gh_est_entier(($_GET['id'])) || $_GET['id'] <= 0)){
     $id = $_SESSION['usID'];
 }
 
-$sqlUserData = "SELECT users.*
-                FROM users
-                WHERE users.usID = $id";
-
-$userData = mysqli_fetch_assoc(gh_bd_send_request($GLOBALS['db'], $sqlUserData));
-
-$sqlStats = "SELECT COUNT(*) AS nbBlablas
-             FROM blablas
-             WHERE blablas.blIDAuteur = $id
-             UNION
-             SELECT COUNT(*) AS nbMentions
-             FROM mentions
-             WHERE mentions.meIDUser = $id";
-$stats = mysqli_fetch_assoc(gh_bd_send_request($GLOBALS['db'], $sqlStats));
-
-echo '<pre>';
-print_r($userData);
-print_r($stats);
-echo '</pre>';
-die;
+$userStats = gh_sql_get_user_stats($db, $id);
+$userData = gh_sql_get_user_info($db, $id);
 
 // if user is not found, get current user's data
-if (! $userData){
-    $sqlUserData = "SELECT *
-               FROM users
-               WHERE usId = ". $_SESSION['usID'];
-    $userData = mysqli_fetch_assoc(gh_bd_send_request($GLOBALS['db'], $sqlUserData));
+if (! $userStats){
+    $userStats = gh_sql_get_user_stats($db, $_SESSION['usID']);
+    $userData = gh_sql_get_user_info($db, $_SESSION['usID']);
 }
-
-$userData = gh_html_proteger_sortie($userData);
 
 /*------------------------------------------------------------------------------
 - Generating the html code for the page
 ------------------------------------------------------------------------------*/
-gh_aff_debut('Cuiteur | Profil de '. $userData['usPseudo'], '../styles/cuiteur.css');
+gh_aff_debut('Cuiteur | Profil de '. $userStats['usPseudo'], '../styles/cuiteur.css');
 
-gh_aff_entete('Le profil de '. $userData['usPseudo']);
+gh_aff_entete('Le profil de '. $userStats['usPseudo']);
 gh_aff_infos(true);
 
+gh_aff_user_stats($userStats);
 gh_aff_user_info($userData);
 
 gh_aff_pied();
@@ -81,13 +60,28 @@ mysqli_close($db);
      * @param array $userData User's data
      */
     function gh_aff_user_info(array $userData){
-        $photoProfilPath = $userData['usAvecPhoto'] == '1' ? '../upload/'. $userData['usID'] .'.jpg' : '../images/anonyme.jpg';
-        echo '<p>',
-                '<img src="', $photoProfilPath, '" alt="Photo de profil" class="photoProfil">',
-                gh_html_a('./utilisateur.php?id='. $userData['usID'], $userData['usPseudo']), ' ', $userData['usNom'],
-                gh_html_a('./blablas.php?id='. $userData['usID'], $userData['nbBlablas'] .' blabla'. ($userData['nbBlablas'] > 1 ? 's' : '')),
-                gh_html_a('./mentions.php?id='. $userData['usID'], $userData['nbMentions'] .' mention'. ($userData['nbMentions'] > 1 ? 's' : '')),
-                gh_html_a('./abonnes.php?id='. $userData['usID'], $userData['nbAbonnes'] .' abonnement'. ($userData['nbAbonnes'] > 1 ? 's' : '')),
-                gh_html_a('./abonnements.php?id='. $userData['usID'], $userData['nbAbonnements'] .' abonné'. ($userData['nbAbonnements'] > 1 ? 's' : '')),
-             '</p>';
+        echo '<article id="userInfo">',
+                '<table>',
+                    '<tr>',
+                        '<td>Date de naissance :</td>',
+                        '<td>'. gh_amj_clair($userData['usDateNaissance']) .'</td>',
+                    '</tr>',
+                    '<tr>',
+                        '<td>Date d\'inscription :</td>',
+                        '<td>'. gh_amj_clair($userData['usDateInscription']) .'</td>',
+                    '</tr>',
+                    '<tr>',
+                        '<td>Vile de résidence :</td>',
+                        '<td>'. $userData['usVille'] .'</td>',
+                    '</tr>',
+                    '<tr>',
+                        '<td>Mini-bio :</td>',
+                        '<td>'. $userData['usBio'] .'</td>',
+                    '</tr>',
+                    '<tr>',
+                        '<td>Site web :</td>',
+                        '<td>'. $userData['usWeb'] .'</td>',
+                    '</tr>',
+                '</table>',
+            '</article>';
     }

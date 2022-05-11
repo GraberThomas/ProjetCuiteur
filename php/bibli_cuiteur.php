@@ -182,6 +182,24 @@ function gh_aff_blablas(mysqli_result $r): void {
                 '</li>';
     }
 }
+//_______________________________________________________________
+/**
+* Show user's stats
+*
+*
+* @param array  $data       Array containing user's stats
+*/
+function gh_aff_user_stats(array $data): void {
+    $photoProfilPath = $data['usAvecPhoto'] == '1' ? '../upload/'. $data['usID'] .'.jpg' : '../images/anonyme.jpg';
+        echo '<p class="userStats">',
+                '<img src="', $photoProfilPath, '" alt="Photo de profil" class="photoProfil">',
+                gh_html_a('./utilisateur.php?id='. $data['usID'], $data['usPseudo']), ' ', $data['usNom'], '<br>',
+                gh_html_a('./blablas.php?id='. $data['usID'], $data['nbBlablas'] .' blabla'. ($data['nbBlablas'] > 1 ? 's' : '')), ' - ',
+                gh_html_a('./mentions.php?id='. $data['usID'], $data['nbMentions'] .' mention'. ($data['nbMentions'] > 1 ? 's' : '')), ' - ',
+                gh_html_a('./abonnes.php?id='. $data['usID'], $data['nbAbonnes'] .' abonné'. ($data['nbAbonnes'] > 1 ? 's' : '')), ' - ',
+                gh_html_a('./abonnements.php?id='. $data['usID'], $data['nbAbonnements'] .' abonnement'. ($data['nbAbonnements'] > 1 ? 's' : '')),
+             '</p>';
+}
 
 //_______________________________________________________________
 /**
@@ -337,38 +355,57 @@ function gh_verif_passe(string $passe1, string $passe2, array &$errors): void {
 }
 //_______________________________________________________________
 /**
- * Get stats about a user (usPseudo, usNom, nbBlablas, nbMentions, nbAbonnes, nbAbonnements)
+ * Get all info about a user
  * 
  * @param mysqli   $mysqli    MySQLi object
  * @param int      $id        User's id
  * @return array              User's info
  */
+function gh_sql_get_user_info(mysqli $db, int $id): array {
+    $sql = "SELECT *
+            FROM users
+            WHERE usID = $id";
+    $results = gh_bd_send_request($db, $sql);
+    $data = mysqli_fetch_assoc($results);
+    return gh_html_proteger_sortie($data);
+    
+}
+//_______________________________________________________________
+/**
+ * Get stats about a user (usID, usPseudo, usNom, usAvecPhoto, nbBlablas, nbMentions, nbAbonnes, nbAbonnements)
+ * 
+ * @param mysqli   $mysqli    MySQLi object
+ * @param int      $id        User's id
+ * @return array              User's stats
+ */
 function gh_sql_get_user_stats(mysqli $db, int $id): array {
-    $sql = "SELECT usPseudo, usNom
+    $sql = "SELECT usID, usPseudo, usNom, usAvecPhoto
             FROM users
             WHERE usId = $id
             UNION ALL
-            SELECT COUNT(*), NULL
+            SELECT COUNT(*), NULL, NULL, NULL
             FROM blablas
             WHERE blIDAuteur = $id
             UNION ALL
-            SELECT COUNT(*), NULL
+            SELECT COUNT(*), NULL, NULL, NULL
             FROM mentions
             WHERE meIDUser = $id
             UNION ALL
-            SELECT COUNT(*), NULL
+            SELECT COUNT(*), NULL, NULL, NULL
             FROM estabonne
             WHERE eaIDUser = $id
             UNION ALL
-            SELECT COUNT(*), NULL
+            SELECT COUNT(*), NULL, NULL, NULL
             FROM estabonne
             WHERE eaIDAbonne = $id";
 
     $results = gh_bd_send_request($db, $sql);
     $row = mysqli_fetch_array($results);
     $data = array(
-        'usPseudo' => $row[0],
-        'usNom' => $row[1]
+        'usID' => $row[0],
+        'usPseudo' => $row[1],
+        'usNom' => $row[2],
+        'usAvecPhoto' => $row[3]
     );
     $row = mysqli_fetch_array($results);
     $data['nbBlablas'] = $row[0];
@@ -378,5 +415,5 @@ function gh_sql_get_user_stats(mysqli $db, int $id): array {
     $data['nbAbonnes'] = $row[0];
     $row = mysqli_fetch_array($results);
     $data['nbAbonnements'] = $row[0];
-    return $data;
+    return gh_html_proteger_sortie($data);
 }

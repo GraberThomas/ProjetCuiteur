@@ -20,12 +20,7 @@ $db = gh_bd_connect();
 - Get user's data
 - Check form submission
 ------------------------------------------------------------------------------*/
-$sqlUserData = 'SELECT usNom, usDateNaissance, usVille, usBio, usMail, usWeb, usPasse, usAvecPhoto
-                FROM users
-                WHERE usID = ' . $_SESSION['usID'];
-
-$userData = mysqli_fetch_assoc(gh_bd_send_request($GLOBALS['db'], $sqlUserData));
-$userData = gh_html_proteger_sortie($userData);
+$userData = gh_sql_get_user_info($db, $_SESSION['usID']);
 
 $erPersonalInfo = isset($_POST['btnModifyPersonalInfo']) ? gh_traitement_infos_perso() : array();
 $erCuiteurAccountInfo = isset($_POST['btnModifyCuiteurAccountInfo']) ? gh_traitement_infos_compte_cuiteur() : array();

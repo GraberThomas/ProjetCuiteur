@@ -377,3 +377,41 @@ footer a {
 footer a:hover {
     opacity: 1;
 }
+
+/* ---------------------------------------------------------------
+    User's info
+--------------------------------------------------------------- */
+#userInfo {
+    margin-top: 50px;
+}
+
+#userInfo table td {
+    padding: 7px;
+}
+
+#userInfo table td:first-child {
+    text-align: right;
+    vertical-align: middle;
+    width: 150px;
+    font-weight: bold;
+}
+
+/* ---------------------------------------------------------------
+    Reusable elements
+--------------------------------------------------------------- */
+.userStats {
+    font-weight: bold;
+}
+
+.userStats img {
+    float: left;
+    margin-right: 10px;
+}
+
+.userStats img::after {
+    clear: both;
+}
+
+.userStats + .userInfo {
+    clear: both;
+}

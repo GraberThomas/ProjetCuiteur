@@ -206,6 +206,19 @@ function gh_convert_date_to_input_format(string $yyyymmdd):string {
 }
 //_______________________________________________________________
 /**
+* Convert a date from input to sql format.
+*
+* We consider that the date is valid.
+*
+* @param  string    $date    the date yyyy-mm-dd to format
+* @return string    The date converted in sql format
+*/
+function gh_convert_date_to_sql_format(string $date):string {
+    list($yyyy, $mm, $dd) = explode('-', $date);
+    return $yyyy.$mm.$dd;
+}
+//_______________________________________________________________
+/**
 * Transformation d'une heure HH:MM:SS en clair.
 *
 *

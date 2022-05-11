@@ -185,12 +185,13 @@ function eml_traitement_inscription(): array {
     $passe1 = password_hash($_POST['passe1'], PASSWORD_DEFAULT);
     $passe1 = gh_bd_proteger_entree($bd, $passe1);
     
-    $aaaammjj = $annee*10000  + $mois*100 + $jour;
+    // convert date of birth to sql format
+    $yyyymmdd = gh_convert_date_to_sql_format($_POST['usDateNaissance']);
     
     $date_inscription = date('Ymd');
     
     $sql = "INSERT INTO users(usNom, usVille, usWeb, usMail, usPseudo, usPasse, usBio, usDateNaissance, usDateInscription) 
-            VALUES ('$nomprenom', '', '', '$email', '$pseudo', '$passe1',  '', $aaaammjj, $date_inscription)";
+            VALUES ('$nomprenom', '', '', '$email', '$pseudo', '$passe1',  '', $yyyymmdd, $date_inscription)";
             
     gh_bd_send_request($bd, $sql);
     

@@ -168,9 +168,8 @@ function gh_traitement_infos_perso(): array {
     $city = gh_bd_proteger_entree($GLOBALS['db'], $_POST['usVille']);
     $bio = gh_bd_proteger_entree($GLOBALS['db'], $_POST['usBio']);
 
-    list($day, $month, $year) = explode('-', $_POST['usDateNaissance']);
-    $yyyymmdd = $year*10000  + $month*100 + $day;
-
+    // convert date of birth to sql format
+    $yyyymmdd = gh_convert_date_to_sql_format($_POST['usDateNaissance']);
 
     $sql = "UPDATE users
             SET usNom = '$name',

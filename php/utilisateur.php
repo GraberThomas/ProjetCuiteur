@@ -23,6 +23,8 @@ if (isset($_GET['id']) && (! gh_est_entier(($_GET['id'])) || $_GET['id'] <= 0)){
     $id = $_SESSION['usID'];
 }
 
+$id = gh_bd_proteger_entree($db, $id);
+
 $userStats = gh_sql_get_user_stats($db, $id);
 $userData = gh_sql_get_user_info($db, $id);
 

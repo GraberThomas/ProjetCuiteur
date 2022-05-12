@@ -367,6 +367,10 @@ function gh_sql_get_user_info(mysqli $db, int $id): array {
             WHERE usID = $id";
     $results = gh_bd_send_request($db, $sql);
     $data = mysqli_fetch_assoc($results);
+    // if no data, return empty array
+    if ($data === null) {
+        return [];
+    }
     return gh_html_proteger_sortie($data);
     
 }
@@ -401,6 +405,12 @@ function gh_sql_get_user_stats(mysqli $db, int $id): array {
 
     $results = gh_bd_send_request($db, $sql);
     $row = mysqli_fetch_array($results);
+
+    // if no data, return empty array
+    if ($row[0] == "0") {
+        return [];
+    }
+
     $data = array(
         'usID' => $row[0],
         'usPseudo' => $row[1],

@@ -145,15 +145,14 @@ function gh_aff_pied(): void{
 
 //_______________________________________________________________
 /**
-* Affichages des résultats des SELECT des blablas.
+* Generate the html code to display blablas 
 *
-* La fonction gére la boucle de lecture des résultats et les
-* encapsule dans du code HTML envoyé au navigateur 
-*
-* @param mysqli_result  $r       Objet permettant l'accès aux résultats de la requête SELECT
+* @param mysqli_result  $r           Result of the SELECT query
+* @param int            $nbToDisplay Number of results to display (0 = all)
 */
-function gh_aff_blablas(mysqli_result $r): void {
-    while ($t = mysqli_fetch_assoc($r)) {
+function gh_aff_blablas(mysqli_result $r, int $nbToDisplay = 0): void {
+    $t = mysqli_fetch_assoc($r);
+    for ($i = 0; $t != NULL && ($nbToDisplay === 0 || $i < $nbToDisplay); $i++) {
         if ($t['oriID'] === null){
             $id_orig = $t['autID'];
             $pseudo_orig = $t['autPseudo'];
@@ -174,8 +173,17 @@ function gh_aff_blablas(mysqli_result $r): void {
                     ($t['oriID'] !== null ? ', recuité par '
                                             .gh_html_a( 'utilisateur.php','<strong>'.gh_html_proteger_sortie($t['autPseudo']).'</strong>',
                                                         'id', $t['autID'], 'Voir mes infos') : ''),
-                    '<br>',
-                    gh_html_proteger_sortie($t['blTexte']),
+                    '<br>';
+                    // display the blabla, and convert the mentions and tags into links
+                    $blabla = gh_html_proteger_sortie($t['blTexte']);
+                    $blabla = preg_replace('/@([a-zA-Z0-9_]+)/',
+                    gh_html_a('utilisateur.php', '@$1', 'id', '$1', 'Voir les infos de $1'), $blabla);
+
+                    // replace tags, but not special characters
+                    $blabla = preg_replace('/[^&]#([a-zA-Z0-9_]+)/',
+                    gh_html_a('tendance.php', '#$1', 'id', '$1', 'Voir les blablas contenant $1'), $blabla);
+
+                    echo $blabla,
                     '<p class="finMessage">',
                     gh_amj_clair($t['blDate']), ' à ', gh_heure_clair($t['blHeure']);
 
@@ -186,6 +194,7 @@ function gh_aff_blablas(mysqli_result $r): void {
                         echo '<a href="../index.php">Répondre</a> <a href="../index.php">Recuiter</a></p>';
                     }
             echo '</li>';
+        $t = mysqli_fetch_assoc($r);
     }
 }
 //_______________________________________________________________

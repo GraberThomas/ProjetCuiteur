@@ -40,7 +40,6 @@
 
     $nbRows = (int) mysqli_num_rows(gh_bd_send_request($db, $sqlBlablas));
 
-    $sqlBlablas .= " LIMIT $nbToDisplay";
     $res = gh_bd_send_request($db, $sqlBlablas);
 
 
@@ -55,7 +54,7 @@
         echo '<li>Votre fil de blablas est vide</li>';
     }
     else{
-        gh_aff_blablas($res);
+        gh_aff_blablas($res, $nbToDisplay);
         echo '<li class="plusBlablas">';
             if ($nbRows > $nbToDisplay){
                     echo '<a href="cuiteur.php?numberCuit=',$nbToDisplay+NUMBER_CUIT_DISPLAY,'"><strong>Plus de blablas</strong></a>',

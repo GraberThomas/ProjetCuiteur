@@ -7,7 +7,7 @@
 
     // If user is authentificated, we redirect him to Cuiteur.php
     if (gh_est_authentifie()){
-        header('Location: ./php/cuiteur.php, TRUE, 308');
+        header('Location: ./php/cuiteur.php', TRUE, 308);
         exit;
     }
 

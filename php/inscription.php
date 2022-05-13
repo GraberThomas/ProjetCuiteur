@@ -186,7 +186,7 @@ function eml_traitement_inscription(): array {
     $passe1 = gh_bd_proteger_entree($bd, $passe1);
     
     // convert date of birth to sql format
-    $yyyymmdd = gh_convert_date_to_sql_format($_POST['usDateNaissance']);
+    $yyyymmdd = gh_convert_date_to_sql_format($_POST['naissance']);
     
     $date_inscription = date('Ymd');
     

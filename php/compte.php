@@ -304,7 +304,7 @@ function gh_traitement_infos_compte_cuiteur(): array {
         else if (isset($_POST['btnModifyCuiteurAccountSettings'])) {
             echo '<p class="success">'.MSG_SUCCESS_MODIFY_PROFILE.'</p>';  
         }
-        if ((isset($_POST['btnModifyCuiteurAccountSettings']) && $_POST['usAvecPhoto'] == '1') || (!isset($_POST['btnModifyCuiteurAccountSettings']) && $GLOBALS['userData']['usAvecPhoto'] == '1')) {
+        if ((isset($_POST['btnModifyCuiteurAccountSettings']) && $_POST['usAvecPhoto'] == '1') || (!isset($_POST['btnModifyCuiteurAccountSettings']) && $values['usAvecPhoto'] == '1')) {
             $photoProfilePath =  '../upload/' . $_SESSION['usID'] . '.jpg';
         }
         else {
@@ -332,7 +332,7 @@ function gh_traitement_infos_compte_cuiteur(): array {
                             '<label for="usAvecPhoto">Utiliser votre photo :</label>',
                         '</td>',
                         '<td>';
-                            if ((isset($_POST['btnModifyCuiteurAccountSettings']) && $_POST['usAvecPhoto'] == '0') || (!isset($_POST['btnModifyCuiteurAccountSettings']) && $GLOBALS['userData']['usAvecPhoto'] == '0')) {
+                            if ((isset($_POST['btnModifyCuiteurAccountSettings']) && $_POST['usAvecPhoto'] == '0') || (!isset($_POST['btnModifyCuiteurAccountSettings']) && $values['usAvecPhoto'] == '0')) {
                                 echo '<input type="radio" name="usAvecPhoto" value="0" id="usAvecPhoto" checked>';
                             }
                             else {
@@ -340,7 +340,7 @@ function gh_traitement_infos_compte_cuiteur(): array {
                             }
                             echo '<label for="usAvecPhoto">non</label>';
 
-                            if ((isset($_POST['btnModifyCuiteurAccountSettings']) && $_POST['usAvecPhoto'] == '1') || (!isset($_POST['btnModifyCuiteurAccountSettings']) && $GLOBALS['userData']['usAvecPhoto'] == '1')) {
+                            if ((isset($_POST['btnModifyCuiteurAccountSettings']) && $_POST['usAvecPhoto'] == '1') || (!isset($_POST['btnModifyCuiteurAccountSettings']) && $values['usAvecPhoto'] == '1')) {
                                 echo '<input type="radio" name="usAvecPhoto" value="1" id="usAvecPhoto" checked>';
                             }
                             else {

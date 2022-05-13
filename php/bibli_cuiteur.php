@@ -43,8 +43,6 @@ define('AGE_MAX', 120);
 
 define("NUMBER_CUIT_DISPLAY",4);
 define('MAX_PHOTO_PROFILE_WEIGHT_KB', 20); // in kB
-define('MIN_PHOTO_PROFILE_SIZE', 50); // in px
-
 
 //_______________________________________________________________
 /**

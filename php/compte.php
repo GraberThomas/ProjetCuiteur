@@ -323,7 +323,7 @@ function gh_traitement_infos_compte_cuiteur(): array {
                         '<td>',
                             '<img class="photoProfil" src="'.$photoProfilePath.'" alt="Photo de profil">',
                             '<p>Taille '.MAX_PHOTO_PROFILE_WEIGHT_KB.'ko maximum</p>',
-                            '<p>Image JPG carrée (mini '.MIN_PHOTO_PROFILE_SIZE.'x'.MIN_PHOTO_PROFILE_SIZE.'px)</p>',
+                            '<p>Image JPG carrée (mini 50x50px)</p>',
                             '<input type="file" name="usPhoto" accept="image/jpeg">',
                         '</td>',
                     '</tr>',
@@ -400,7 +400,7 @@ function gh_traitement_parametres_compte_cuiteur(): array {
             // check the size
             $size = getimagesize($_FILES['usPhoto']['tmp_name']);
             if ($size[0] < 50 || $size[1] < 50) {
-                $errors[] = 'L\'image doit être au moins de '.MIN_PHOTO_PROFILE_SIZE. 'x'.MIN_PHOTO_PROFILE_SIZE.'px.';
+                $errors[] = 'L\'image doit être au moins de 50x50px.';
             }
             // check the weight
             $maxSizeInBytes = MAX_PHOTO_PROFILE_WEIGHT_KB * 1024;
@@ -439,15 +439,7 @@ function gh_traitement_parametres_compte_cuiteur(): array {
         if (file_exists($photoProfilPath)) {
             unlink($photoProfilPath);
         }
-
-        // redim the photo to the correct size if needed
-        $size = getimagesize($_FILES['usPhoto']['tmp_name']);
-        if ($size[0] != MIN_PHOTO_PROFILE_SIZE || $size[1] != MIN_PHOTO_PROFILE_SIZE) {
-            $image = imagecreatefromjpeg($_FILES['usPhoto']['tmp_name']);
-            $image = imagescale($image, MIN_PHOTO_PROFILE_SIZE, MIN_PHOTO_PROFILE_SIZE);
-            imagejpeg($image, $photoProfilPath);
-        }
-        
+    
         move_uploaded_file($_FILES['usPhoto']['tmp_name'], $photoProfilPath);
     }
     return array();

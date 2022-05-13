@@ -10,40 +10,58 @@
         exit;
     }
 
+    $db = gh_bd_connect();
+
+    /*--------------------------------------------------------------------------------------------
+    - Handle new message publication (if any)
+    ---------------------------------------------------------------------------------------------*/
+    if(isset($_POST['btnPublish'])){
+        gh_handle_message_publication($db);
+    }
+
+    /*--------------------------------------------------------------------------------------------
+    - Send query to get user's feed and another to get total number of posts to show in the feed
+    ---------------------------------------------------------------------------------------------*/
+    $nbToDisplay = isset($_GET['numberCuit']) && gh_est_entier($_GET['numberCuit']) &&  $_GET['numberCuit'] > 0 ? $_GET['numberCuit'] : NUMBER_CUIT_DISPLAY;
+    $nbToDisplay = (int) gh_bd_proteger_entree($db, $nbToDisplay);
+    $usID = gh_bd_proteger_entree($db, $_SESSION['usID']);
+    $sqlBlablas = "SELECT DISTINCT auteur.usID AS autID, auteur.usPseudo AS autPseudo, auteur.usNom AS autNom, auteur.usAvecPhoto AS autPhoto, 
+                    blTexte, blDate, blHeure,
+                    origin.usID AS oriID, origin.usPseudo AS oriPseudo, origin.usNom AS oriNom, origin.usAvecPhoto AS oriPhoto
+                    FROM (((users AS auteur
+                    INNER JOIN blablas ON blIDAuteur = usID)
+                    LEFT OUTER JOIN users AS origin ON origin.usID = blIDAutOrig)
+                    LEFT OUTER JOIN estabonne ON auteur.usID = eaIDAbonne)
+                    LEFT OUTER JOIN mentions ON blID = meIDBlabla
+                    WHERE   auteur.usID = $usID
+                    OR      eaIDUser = $usID
+                    OR      meIDUser = $usID
+                    ORDER BY blID DESC";
+
+    $nbRows = (int) mysqli_num_rows(gh_bd_send_request($db, $sqlBlablas));
+
+    $sqlBlablas .= " LIMIT $nbToDisplay";
+    $res = gh_bd_send_request($db, $sqlBlablas);
+
+
     /*-----------------------------------------------------------------------------
     - Generate HTML page
     ------------------------------------------------------------------------------*/
-    $nb = isset($_GET['numberCuit']) && gh_est_entier($_GET['numberCuit']) &&  $_GET['numberCuit'] > 0 ? $_GET['numberCuit'] : NUMBER_CUIT_DISPLAY;
-    $db = gh_bd_connect();
-    $usID = gh_bd_proteger_entree($db, $_SESSION['usID']);
-    $sql = "SELECT  DISTINCT auteur.usID AS autID, auteur.usPseudo AS autPseudo, auteur.usNom AS autNom, auteur.usAvecPhoto AS autPhoto, 
-                    blTexte, blDate, blHeure,
-                    origin.usID AS oriID, origin.usPseudo AS oriPseudo, origin.usNom AS oriNom, origin.usAvecPhoto AS oriPhoto
-            FROM (((users AS auteur
-            INNER JOIN blablas ON blIDAuteur = usID)
-            LEFT OUTER JOIN users AS origin ON origin.usID = blIDAutOrig)
-            LEFT OUTER JOIN estabonne ON auteur.usID = eaIDAbonne)
-            LEFT OUTER JOIN mentions ON blID = meIDBlabla
-            WHERE   auteur.usID = $usID
-            OR      eaIDUser = $usID
-            OR      meIDUser = $usID
-            ORDER BY blID DESC
-            LIMIT $nb, $nb";
-    $res = gh_bd_send_request($db, $sql);
-
     gh_aff_debut('Cuiteur', '../styles/cuiteur.css');
     gh_aff_entete();
     gh_aff_infos(true);
     echo '<ul>';
-    if (mysqli_num_rows($res) == 0){
+    if ($nbRows == 0){
         echo '<li>Votre fil de blablas est vide</li>';
     }
     else{
         gh_aff_blablas($res);
-        echo '<li class="plusBlablas">',
-                '<a href="cuiteur.php?numberCuit=',$nb+NUMBER_CUIT_DISPLAY,'"><strong>Plus de blablas</strong></a>',
-                '<img src="../images/speaker.png" width="75" height="82" alt="Image du speaker \'Plus de blablas\'">',
-            '</li>';
+        echo '<li class="plusBlablas">';
+            if ($nbRows > $nbToDisplay){
+                    echo '<a href="cuiteur.php?numberCuit=',$nbToDisplay+NUMBER_CUIT_DISPLAY,'"><strong>Plus de blablas</strong></a>',
+                        '<img src="../images/speaker.png" width="75" height="82" alt="Image du speaker \'Plus de blablas\'">';
+            }
+        echo '</li>';
     }
     echo '</ul>';
     gh_aff_pied();
@@ -53,3 +71,63 @@
     // libération des ressources
     mysqli_free_result($res);
     mysqli_close($db);
+
+
+    // ----------  Local functions ----------- //
+
+    /**
+     * Handle new message publication
+     *
+     * @param  mysqli $db database connection
+     * @global $_POST array containing form data
+     */
+    function gh_handle_message_publication(mysqli $db){
+        $message = gh_bd_proteger_entree($db, $_POST['txtMessage']);
+
+        if (empty($message)){
+            return;
+        }
+
+        // check for mentions
+        $mentions = array();
+        $regex = '/@([a-zA-Z0-9_]+)/';
+        preg_match_all($regex, $message, $mentions);
+
+        // check for tags
+        $tags = array();
+        $regex = '/#([a-zA-Z0-9_]+)/';
+        preg_match_all($regex, $message, $tags);
+
+        // get current date and time
+        $date = date('Ymd');
+        $heure = date('H:i:s');
+
+        // insert message
+        $sqlInsertMessage = "INSERT
+                             INTO blablas
+                             VALUES (NULL, '$_SESSION[usID]', '$date', '$heure', '$message', NULL)";
+        gh_bd_send_request($db, $sqlInsertMessage);
+
+        // get message ID   
+        $messageId = (int) mysqli_insert_id($db);
+
+        // insert mentions
+        foreach ($mentions[1] as $mention){
+            $sqlGetUserId = "SELECT usID FROM users WHERE usPseudo = '$mention'";
+            $res = gh_bd_send_request($db, $sqlGetUserId);
+            $userId = (int) mysqli_fetch_assoc($res)['usID'];
+
+            $sqlInsertMention = "INSERT
+                                 INTO mentions
+                                 VALUES ($userId, $messageId)";
+            gh_bd_send_request($db, $sqlInsertMention);
+        }
+
+        // insert tags
+        foreach ($tags[1] as $tag){
+            $sqlInsertTag = "INSERT
+                             INTO tags
+                             VALUES ('$tag', $messageId)";
+            gh_bd_send_request($db, $sqlInsertTag);
+        }
+    }

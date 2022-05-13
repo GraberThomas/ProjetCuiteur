@@ -69,7 +69,7 @@ function gh_aff_entete(?string $titre = null, bool $connected=true):void{
     if ($titre === null){
         echo    '<form action="../index.php" method="POST">',
                     '<textarea name="txtMessage"></textarea>',
-                    '<input type="submit" name="btnPublier" value="" title="Publier mon message">',
+                    '<input type="submit" name="btnPublish" value="" title="Publier mon message">',
                 '</form>';
     }
     else{
@@ -177,9 +177,15 @@ function gh_aff_blablas(mysqli_result $r): void {
                     '<br>',
                     gh_html_proteger_sortie($t['blTexte']),
                     '<p class="finMessage">',
-                    gh_amj_clair($t['blDate']), ' à ', gh_heure_clair($t['blHeure']),
-                    '<a href="../index.php">Répondre</a> <a href="../index.php">Recuiter</a></p>',
-                '</li>';
+                    gh_amj_clair($t['blDate']), ' à ', gh_heure_clair($t['blHeure']);
+
+                    if ($id_orig === $_SESSION['usID']){
+                        echo '<a href="../index.php">Supprimer</a></p>';
+                    }
+                    else {
+                        echo '<a href="../index.php">Répondre</a> <a href="../index.php">Recuiter</a></p>';
+                    }
+            echo '</li>';
     }
 }
 //_______________________________________________________________

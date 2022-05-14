@@ -15,9 +15,7 @@
     /*--------------------------------------------------------------------------------------------
     - Handle new message publication (if any)
     ---------------------------------------------------------------------------------------------*/
-    if(isset($_POST['btnPublish'])){
-        gh_handle_message_publication($db);
-    }
+    $er = isset($_POST['btnPublish']) ? gh_handle_message_publication($db) : array();
 
     /*--------------------------------------------------------------------------------------------
     - Send query to get user's feed and another to get total number of posts to show in the feed
@@ -47,14 +45,27 @@
     - Generate HTML page
     ------------------------------------------------------------------------------*/
     gh_aff_debut('Cuiteur', '../styles/cuiteur.css');
-    gh_aff_entete();
+    if(count($er) > 0){
+        gh_aff_entete(null, true, $_POST['txtMessage']);
+    }else{
+        gh_aff_entete(null, true);
+    }
     gh_aff_infos(true);
     echo '<ul>';
+
+    if (count($er) > 0) {
+        echo '<p class="error" id="error_input_cuit">Les erreurs suivantes ont été détectées :';
+        foreach ($er as $v) {
+            echo '<br> - ', $v;
+        }
+        echo '</p><br>';    
+    }
+    
     if ($nbRows == 0){
         echo '<li>Votre fil de blablas est vide</li>';
     }
     else{
-        gh_aff_blablas($res, $nbToDisplay);
+        gh_aff_blablas($db, $res, $nbToDisplay);
         echo '<li class="plusBlablas">';
             if ($nbRows > $nbToDisplay){
                     echo '<a href="cuiteur.php?numberCuit=',$nbToDisplay+NUMBER_CUIT_DISPLAY,'"><strong>Plus de blablas</strong></a>',
@@ -79,23 +90,39 @@
      *
      * @param  mysqli $db database connection
      * @global $_POST array containing form data
+     * @return array containing error messages
      */
-    function gh_handle_message_publication(mysqli $db){
+    function gh_handle_message_publication(mysqli $db): array {
         $message = gh_bd_proteger_entree($db, $_POST['txtMessage']);
 
+        $er = array();
         if (empty($message)){
-            return;
+            $er[] = 'Vous n\'avez pas écrit de message';
+            return $er;
         }
 
         // check for mentions
         $mentions = array();
         $regex = '/@([a-zA-Z0-9_]+)/';
         preg_match_all($regex, $message, $mentions);
+        $mentions = array_unique($mentions[1]);
 
+        foreach ($mentions as $i) {
+            $sqlRequest = "SELECT * FROM users WHERE usPseudo='".gh_bd_proteger_entree($db, $i). "'";
+            $R = gh_bd_send_request($db, $sqlRequest);
+            if(mysqli_num_rows($R) == 0){
+                $er[] = 'Le pseudo '.$i.' n\'existe pas';
+            }
+        }
         // check for tags
         $tags = array();
         $regex = '/#([a-zA-Z0-9_]+)/';
         preg_match_all($regex, $message, $tags);
+        $tags = array_unique($tags[1]);
+
+        if (count($er) > 0){
+            return $er;
+        }
 
         // get current date and time
         $date = date('Ymd');
@@ -111,7 +138,7 @@
         $messageId = (int) mysqli_insert_id($db);
 
         // insert mentions
-        foreach ($mentions[1] as $mention){
+        foreach ($mentions as $mention){
             $sqlGetUserId = "SELECT usID FROM users WHERE usPseudo = '$mention'";
             $res = gh_bd_send_request($db, $sqlGetUserId);
             $userId = (int) mysqli_fetch_assoc($res)['usID'];
@@ -123,10 +150,12 @@
         }
 
         // insert tags
-        foreach ($tags[1] as $tag){
+        foreach ($tags as $tag){
             $sqlInsertTag = "INSERT
                              INTO tags
                              VALUES ('$tag', $messageId)";
             gh_bd_send_request($db, $sqlInsertTag);
         }
+
+        return $er;
     }

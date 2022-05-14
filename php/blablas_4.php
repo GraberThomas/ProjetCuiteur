@@ -68,7 +68,7 @@ else{
     // déplace le pointeur interne de résultat associé au jeu de résultat représenté par $res, en le faisant pointer sur la ligne 0
     mysqli_data_seek($res , 0); //pour relire la ligne 0
     
-    gh_aff_blablas($res);
+    gh_aff_blablas($bd, $res);
 }
 
 echo '</ul>';

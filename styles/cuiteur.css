@@ -342,6 +342,11 @@ main input[type="submit"]:hover, main input[type="reset"]:hover {
     background: rgba(255, 255, 255, 0.6);
 }
 
+#error_input_cuit{
+    right: 117px;
+    top: 213px;
+}
+
 .success{
     border: solid 2px rgb(27, 128, 2);
     border-radius: 5px;

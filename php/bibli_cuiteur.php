@@ -48,10 +48,11 @@ define('MAX_PHOTO_PROFILE_WEIGHT_KB', 20); // in kB
 /**
  * Génération et affichage de l'entete des pages
  *
- * @param ?string    $titre  Titre de l'entete (si null, affichage de l'entete de cuiteur.php avec le formulaire)
+ * @param ?string    $titre          Titre de l'entete (si null, affichage de l'entete de cuiteur.php avec le formulaire)
  * @param bool       $with_buttons   If true, show buttons (deconnection, profile modification, ...) => default true
+ * @param ?string    $message        Message to show in the message field
  */
-function gh_aff_entete(?string $titre = null, bool $connected=true):void{
+function gh_aff_entete(?string $titre = null, bool $connected=true, string $message = ''):void{
     echo '<div id="bcContenu">';
     if($connected === true){
         echo    '<header id="header_connected">';
@@ -66,11 +67,14 @@ function gh_aff_entete(?string $titre = null, bool $connected=true):void{
     }
     if ($titre === null){
         echo    '<form action="../index.php" method="POST">',
-                    '<textarea name="txtMessage"></textarea>',
-                    '<input type="submit" name="btnPublish" value="" title="Publier mon message">',
-                '</form>';
-    }
-    else{
+                    '<textarea name="txtMessage">';
+        if($message !== ''){
+            echo gh_html_proteger_sortie($message);
+        }
+        echo    '</textarea>',
+                '<input type="submit" name="btnPublish" value="" title="Publier mon message">',
+            '</form>';   
+    }else{
         echo    '<h1>', $titre, '</h1>';
     }
     echo    '</header>';    
@@ -147,8 +151,9 @@ function gh_aff_pied(): void{
 *
 * @param mysqli_result  $r           Result of the SELECT query
 * @param int            $nbToDisplay Number of results to display (0 = all)
+* @param mysqli         $db          Database connection
 */
-function gh_aff_blablas(mysqli_result $r, int $nbToDisplay = 0): void {
+function gh_aff_blablas(mysqli $db, mysqli_result $r, int $nbToDisplay = 0): void {
     $t = mysqli_fetch_assoc($r);
     for ($i = 0; $t != NULL && ($nbToDisplay === 0 || $i < $nbToDisplay); $i++) {
         if ($t['oriID'] === null){
@@ -174,18 +179,32 @@ function gh_aff_blablas(mysqli_result $r, int $nbToDisplay = 0): void {
                     '<br>';
                     // display the blabla, and convert the mentions and tags into links
                     $blabla = gh_html_proteger_sortie($t['blTexte']);
-                    $blabla = preg_replace('/@([a-zA-Z0-9_]+)/',
-                    gh_html_a('utilisateur.php', '@$1', 'id', '$1', 'Voir les infos de $1'), $blabla);
 
-                    // replace tags, but not special characters
-                    $blabla = preg_replace('/[^&]#([a-zA-Z0-9_]+)/',
-                    gh_html_a('tendance.php', '#$1', 'id', '$1', 'Voir les blablas contenant $1'), $blabla);
+                    $mentions = array();
+                    $tags = array();
+
+                    // extract mentions and tags
+                    preg_match_all('/@([a-zA-Z0-9_]+)/', $blabla, $mentions);
+                    preg_match_all('/#([a-zA-Z0-9_]+)/', $blabla, $tags);
+
+                    // replace mentions and tags by links
+                    foreach ($mentions[1] as $m) {
+                        $sqlGetUserId = "SELECT usID
+                                         FROM   users
+                                         WHERE  usPseudo = '$m'";
+                        $result = gh_bd_send_request($db, $sqlGetUserId);
+                        $row = mysqli_fetch_assoc($result);
+                        $blabla = str_replace('@'.$m, gh_html_a('utilisateur.php', '@'.$m, 'id', $row['usID'], 'Voir les infos de '.$m), $blabla);
+                    }
+
+                    foreach ($tags[1] as $tag) {
+                        $blabla = str_replace('#'.$tag, gh_html_a('tag.php', '#'.$tag, 'tag', $tag, 'Voir les blablas contenant le tag '.$tag), $blabla);
+                    }
 
                     echo $blabla,
                     '<p class="finMessage">',
                     gh_amj_clair($t['blDate']), ' à ', gh_heure_clair($t['blHeure']);
-
-                    if ($id_orig === $_SESSION['usID']){
+                    if ($id_orig == $_SESSION['usID']){
                         echo '<a href="../index.php">Supprimer</a></p>';
                     }
                     else {

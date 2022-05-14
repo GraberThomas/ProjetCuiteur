@@ -333,12 +333,12 @@ function gh_traitement_infos_compte_cuiteur(): array {
                         '</td>',
                         '<td>';
                             if ((isset($_POST['btnModifyCuiteurAccountSettings']) && $_POST['usAvecPhoto'] == '0') || (!isset($_POST['btnModifyCuiteurAccountSettings']) && $values['usAvecPhoto'] == '0')) {
-                                echo '<input type="radio" name="usAvecPhoto" value="0" id="usAvecPhoto" checked>';
+                                echo '<input type="radio" name="usAvecPhoto" value="0" id="usSansPhoto" checked>';
                             }
                             else {
-                                echo '<input type="radio" name="usAvecPhoto" value="0" id="usAvecPhoto">';
+                                echo '<input type="radio" name="usAvecPhoto" value="0" id="usSansPhoto">';
                             }
-                            echo '<label for="usAvecPhoto">non</label>';
+                            echo '<label for="usSansPhoto">non</label>';
 
                             if ((isset($_POST['btnModifyCuiteurAccountSettings']) && $_POST['usAvecPhoto'] == '1') || (!isset($_POST['btnModifyCuiteurAccountSettings']) && $values['usAvecPhoto'] == '1')) {
                                 echo '<input type="radio" name="usAvecPhoto" value="1" id="usAvecPhoto" checked>';

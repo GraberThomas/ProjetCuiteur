@@ -31,7 +31,7 @@ if (mysqli_num_rows($res) == 0){
     echo '<li>Votre fil de blablas est vide</li>';
 }
 else{
-    gh_aff_blablas($res);
+    gh_aff_blablas($bd, $res);
 }
 
 echo '</ul>';

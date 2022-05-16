@@ -357,9 +357,13 @@ main input[type="submit"]:hover, main input[type="reset"]:hover {
     background: rgba(255, 255, 255, 0.6);
 }
 
-.titleForm {
+.titleUnderline {
     font-weight: bold;
     border-bottom: 3px solid #e8dbb1;
+}
+
+#recherche table{
+    margin-left: -5px;
 }
 
 /* ---------------------------------------------------------------

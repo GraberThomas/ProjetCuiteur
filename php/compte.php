@@ -63,7 +63,7 @@ mysqli_close($db);
      */
     function gh_aff_formulaire_infos_perso(array $err): void {
 
-        echo '<h2 class="titleForm">Informations personnelles</h2>';
+        echo '<h2 class="titleUnderline">Informations personnelles</h2>';
 
         // If there are errors, display form with sent values
         // Else, retrieve the values from database and display form with them
@@ -189,7 +189,7 @@ function gh_traitement_infos_perso(): array {
      * @global  array   $_POST
      */
     function gh_aff_formulaire_infos_compte_cuiteur(array $err): void {
-        echo '<h2 class="titleForm">Informations sur votre compte Cuiteur</h2>';
+        echo '<h2 class="titleUnderline">Informations sur votre compte Cuiteur</h2>';
 
         // If there are errors, display form with sent values
         // Else, retrieve the values from database and display form with them
@@ -283,7 +283,7 @@ function gh_traitement_infos_compte_cuiteur(): array {
      */
     function gh_aff_formulaire_parametres_compte_cuiteur(array $err): void {
 
-        echo '<h2 class="titleForm">Paramètres de votre compte Cuiteur</h2>';
+        echo '<h2 class="titleUnderline">Paramètres de votre compte Cuiteur</h2>';
 
         // If there are errors, display form with sent values
         // Else, retrieve the values from database and display form with them

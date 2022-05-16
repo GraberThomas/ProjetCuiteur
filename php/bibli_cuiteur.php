@@ -232,7 +232,18 @@ function gh_aff_user_stats(array $data): void {
                 gh_html_a('./abonnements.php?id='. $data['usID'], $data['nbAbonnements'] .' abonnement'. ($data['nbAbonnements'] > 1 ? 's' : '')),
              '</p>';
 }
-
+//_______________________________________________________________
+/**
+* Show user stats in the elements list
+*
+*
+* @param array  $data       Array containing user's stats
+*/
+function gh_aff_user_stats_li(array $data): void {
+    echo '<li>';
+        gh_aff_user_stats($data);
+    echo '</li>';
+}
 //_______________________________________________________________
 /**
 * Détermine si l'utilisateur est authentifié

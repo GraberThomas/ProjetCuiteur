@@ -7,7 +7,12 @@
 
     // If user is authentificated, we redirect him to Cuiteur.php
     if (gh_est_authentifie()){
-        header('Location: ./php/cuiteur.php', TRUE, 308);
+        if ($_SERVER['QUERY_STRING'] == ""){
+            header('Location: ./cuiteur.php');
+        }
+        else {
+            header('Location: ./php/cuiteur.php?'.$_SERVER['QUERY_STRING'], TRUE, 308);
+        }
         exit;
     }
 

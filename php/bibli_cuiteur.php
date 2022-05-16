@@ -208,7 +208,7 @@ function gh_aff_blablas(mysqli $db, mysqli_result $r, int $nbToDisplay = 0): voi
                         echo '<a href="../index.php">Supprimer</a></p>';
                     }
                     else {
-                        echo '<a href="../index.php">Répondre</a> <a href="../index.php">Recuiter</a></p>';
+                        echo '<a href="../index.php?repondre='.$pseudo_orig.'">Répondre</a> <a href="../index.php">Recuiter</a></p>';
                     }
             echo '</li>';
         $t = mysqli_fetch_assoc($r);

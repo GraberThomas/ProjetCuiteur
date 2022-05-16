@@ -205,7 +205,7 @@ function gh_aff_blablas(mysqli $db, mysqli_result $r, int $nbToDisplay = 0): voi
                     '<p class="finMessage">',
                     gh_amj_clair($t['blDate']), ' à ', gh_heure_clair($t['blHeure']);
                     if ($t['autID'] == $_SESSION['usID']){
-                        echo '<a href="../supprimer_blaba.php?idBlabla='.$t['blID'].'">Supprimer</a></p>';
+                        echo '<a href="./supprimer_blabla.php?idBlabla='.$t['blID'].'">Supprimer</a></p>';
                     }
                     else {
                         echo '<a href="../index.php?repondre='.$pseudo_orig.'">Répondre</a> <a href="./recuit.php?idBlabla='.$t['blID'].'">Recuiter</a></p>';

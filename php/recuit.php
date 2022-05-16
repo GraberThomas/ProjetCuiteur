@@ -19,6 +19,8 @@ if(mysqli_num_rows($result) == 0){
 $row = mysqli_fetch_assoc($result);
 $request='INSERT INTO blablas (blTexte, blDate, blHeure, blIDAuteur, blIDAutOrig) VALUES ("'.$_POST['blTexte'].'", "'.date('Y-m-d').'", "'.date('H:i:s').'", '.$_SESSION['usID'].', '.$row['blIDAuteur'].')';
 
+gh_bd_send_request($db, $request);
+
 mysqli_free_result($result);
 mysqli_close($db);
 

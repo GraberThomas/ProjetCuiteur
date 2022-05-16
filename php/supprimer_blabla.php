@@ -12,7 +12,6 @@ if(!isset($_GET['idBlabla'])){
     header('Location: ../index.php');
     exit;
 }
-
 $db = gh_bd_connect();
 $request = 'SELECT * FROM blablas WHERE blID ='.$_GET['idBlabla'];
 $request = gh_bd_proteger_entree($db, $request);
@@ -22,9 +21,23 @@ if(mysqli_num_rows($result) == 0){
     exit;
 }
 $row = mysqli_fetch_assoc($result);
+if($row['blAuteur'] != $_SESSION['usID']){
+    header('Location: ../index.php');
+    exit;
+}
+mysqli_free_result($result);
+$request = 'DELETE FROM mentions WHERE meIDBlabla ='.$_GET['idBlabla'];
+$request = gh_bd_proteger_entree($db, $request);
+$result = gh_bd_send_request($db, $request);
 
-$request='INSERT INTO blablas (blTexte, blDate, blHeure, blIDAuteur, blIDAutOrig) VALUES ("'.$row['blTexte'].'", "'.date('Ymd').'", "'.date('H:i:s').'", '.$_SESSION['usID'].', '.$row['blIDAuteur'].')';
+mysqli_free_result($result);
+$request = 'DELETE FROM tags WHERE taIDBlablas ='.$_GET['idBlabla'];
+$request = gh_bd_proteger_entree($db, $request);
+$result = gh_bd_send_request($db, $request);
 
+mysqli_free_result($result);
+$request='DELETE FROM blablas WHERE blID ='.$_GET['idBlabla'];
+$request = gh_bd_proteger_entree($db, $request);
 gh_bd_send_request($db, $request);
 
 mysqli_free_result($result);

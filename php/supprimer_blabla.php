@@ -17,11 +17,13 @@ $request = 'SELECT * FROM blablas WHERE blID ='.$_GET['idBlabla'];
 $request = gh_bd_proteger_entree($db, $request);
 $result = gh_bd_send_request($db, $request);
 if(mysqli_num_rows($result) == 0){
+    mysqli_free_result($result);
+    mysqli_close($db);
     header('Location: ../index.php');
     exit;
 }
 $row = mysqli_fetch_assoc($result);
-if($row['blAuteur'] != $_SESSION['usID']){
+if($row['blIDAuteur'] != $_SESSION['usID']){
     header('Location: ../index.php');
     exit;
 }
@@ -30,17 +32,14 @@ $request = 'DELETE FROM mentions WHERE meIDBlabla ='.$_GET['idBlabla'];
 $request = gh_bd_proteger_entree($db, $request);
 $result = gh_bd_send_request($db, $request);
 
-mysqli_free_result($result);
-$request = 'DELETE FROM tags WHERE taIDBlablas ='.$_GET['idBlabla'];
+$request = 'DELETE FROM tags WHERE taIDBlabla ='.$_GET['idBlabla'];
 $request = gh_bd_proteger_entree($db, $request);
 $result = gh_bd_send_request($db, $request);
 
-mysqli_free_result($result);
 $request='DELETE FROM blablas WHERE blID ='.$_GET['idBlabla'];
 $request = gh_bd_proteger_entree($db, $request);
 gh_bd_send_request($db, $request);
 
-mysqli_free_result($result);
 mysqli_close($db);
 
 header('Location: ../index.php');

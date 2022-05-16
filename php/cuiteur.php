@@ -24,7 +24,7 @@
     $nbToDisplay = (int) gh_bd_proteger_entree($db, $nbToDisplay);
     $usID = gh_bd_proteger_entree($db, $_SESSION['usID']);
     $sqlBlablas = "SELECT DISTINCT auteur.usID AS autID, auteur.usPseudo AS autPseudo, auteur.usNom AS autNom, auteur.usAvecPhoto AS autPhoto, 
-                    blTexte, blDate, blHeure,
+                    blID, blTexte, blDate, blHeure,
                     origin.usID AS oriID, origin.usPseudo AS oriPseudo, origin.usNom AS oriNom, origin.usAvecPhoto AS oriPhoto
                     FROM (((users AS auteur
                     INNER JOIN blablas ON blIDAuteur = usID)

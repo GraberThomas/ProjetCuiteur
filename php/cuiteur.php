@@ -47,8 +47,10 @@
     gh_aff_debut('Cuiteur', '../styles/cuiteur.css');
     if(count($er) > 0){
         gh_aff_entete(null, true, $_POST['txtMessage']);
-    }else{
-        gh_aff_entete(null, true);
+    }else if(isset($_GET['repondre'])){
+        gh_aff_entete(null, true, '@'.$_GET['repondre']);
+    }else {
+        gh_aff_entete();
     }
     gh_aff_infos(true);
     echo '<ul>';

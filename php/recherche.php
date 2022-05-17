@@ -18,9 +18,12 @@ if (! gh_est_authentifie()){
 $row;
 if(isset($_POST['recherche'])){
     $db = gh_bd_connect();
-    $requete = "SELECT * FROM cuiteur WHERE usPseudo LIKE '%".$_POST['recherche']."%' OR usNom LIKE '%".$_POST['recherche']."%'";
-    $request = gh_bd_proteger_entree($db, $request);
-    $result = gh_bd_send_request($db, $requete);
+    $recherche = gh_bd_proteger_entree($db, $_POST['recherche']);
+    $request = "SELECT DISTINCT users.*, eaIDAbonne
+                FROM users LEFT JOIN estabonne ON users.usID = estabonne.eaIDAbonne
+                WHERE (usPseudo LIKE '%$recherche%' OR usNom LIKE '%$recherche%')";
+                
+    $result = gh_bd_send_request($db, $request);
 }
 
 
@@ -41,17 +44,13 @@ echo '<form  id="recherche" action="recherche.php" method="post">',
         '</table>',
     '</form>';
 if(isset($_POST['recherche'])){
-    echo '<ul>';
-    echo '<h2 class="titleUnderline">Resultats de la recherche</h2>';
-    while ($row = mysqli_fetch_assoc($result) != null) {
-        $stat = gh_sql_get_user_stats($db, $row['usID']);;
-    }
+    gh_aff_user_stats_list($result, $db);
+    // free resources
+    mysqli_free_result($result);
+    mysqli_close($db);
 }
 gh_aff_pied();
 gh_aff_fin();
 
 // facultatif car fait automatiquement par PHP
 ob_end_flush();
-
-// free resources
-mysqli_close($db);

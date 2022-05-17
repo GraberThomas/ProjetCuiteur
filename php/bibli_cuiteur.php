@@ -237,12 +237,29 @@ function gh_aff_user_stats(array $data): void {
 * Show user stats in the elements list
 *
 *
-* @param array  $data       Array containing user's stats
+* @param mysqli_result  $r           Result of the SELECT query
+* @param mysqli         $db          Database connection
 */
-function gh_aff_user_stats_li(array $data): void {
-    echo '<li>';
-        gh_aff_user_stats($data);
-    echo '</li>';
+function gh_aff_user_stats_list(mysqli_result $r, mysqli $db): void {
+    echo '<form id="rechercheResultats" action="./sabonner.php" method="post">',
+            '<ul>';
+    while ($t = mysqli_fetch_assoc($r)) {
+        echo '<li>';
+        gh_aff_user_stats(gh_sql_get_user_stats($db, $t['usID']));
+        if ($t['usID'] !== $_SESSION['usID']){
+            echo '<div class="bouton_sabonner">';
+            if ($t['eaIDAbonne'] == 1) {
+                echo '<input type="checkbox" name="desabonnement_'. $t['usID'] .'" id="desabonnement_'. $t['usID'] .'" value="'. $t['usID'] .'">',
+                     '<label for="abonnement_'. $t['usID'] .'">Se désabonner</label>';
+            }else {
+                echo '<input type="checkbox" name="abonnement_'. $t['usID'] .'" id="abonnement_'. $t['usID'] .'" value="'. $t['usID'] .'">',
+                     '<label for="abonnement_'. $t['usID'] .'">S\'abonner</label>';
+            }
+                echo '</div>';
+        }
+        echo '</li>';
+    }
+    echo '</ul><input type=submit name="btnValiderAbonnement" value="Valider"></form>';
 }
 //_______________________________________________________________
 /**

@@ -362,8 +362,25 @@ main input[type="submit"]:hover, main input[type="reset"]:hover {
     border-bottom: 3px solid #e8dbb1;
 }
 
+/* ---------------------------------------------------------------
+    Search Form
+--------------------------------------------------------------- */
 #recherche table{
     margin-left: -5px;
+}
+
+#rechercheResultats li{
+    min-height: 50px;
+}
+
+.bouton_sabonner {
+    text-align: right;
+    font-weight: bold;
+}
+
+#rechercheResultats input[type="submit"]{
+    margin-top: 15px;
+    margin-left: 220px;
 }
 
 /* ---------------------------------------------------------------
@@ -415,6 +432,7 @@ footer a:hover {
 .userStats img {
     float: left;
     margin-right: 10px;
+    margin-left: -60px;
 }
 
 .userStats img::after {

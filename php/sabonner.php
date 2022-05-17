@@ -22,11 +22,11 @@ foreach ($_POST as $key => $value) {
     if (str_starts_with($key, 'abonnement_')) {
         $id = gh_bd_proteger_entree($db, $value);
         $date = date('Ymd');
-        $request = "INSERT INTO estabonne (eaIDUser, eaIDAbonne, eaDate) VALUES ($id, $_SESSION[usID], $date)";
+        $request = "INSERT INTO estabonne VALUES ($_SESSION[usID], $id, $date)";
         gh_bd_send_request($db, $request);
     }else if(str_starts_with($key, 'desabonnement_')){
         $id = gh_bd_proteger_entree($db, $value);
-        $request = "DELETE FROM estabonne WHERE eaIDAbonne = $_SESSION[usID] AND eaIDUser = $id";
+        $request = "DELETE FROM estabonne WHERE eaIDUser = $_SESSION[usID] AND eaIDAbonne = $id";
         gh_bd_send_request($db, $request);
     }
 }

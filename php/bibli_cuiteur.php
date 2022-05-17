@@ -244,11 +244,17 @@ function gh_aff_user_stats_list(mysqli_result $r, mysqli $db): void {
     echo '<form id="rechercheResultats" action="./sabonner.php" method="post">',
             '<ul>';
     while ($t = mysqli_fetch_assoc($r)) {
+        $request = "SELECT eaIDAbonne
+                    FROM estabonne
+                    WHERE eaIDUser = '". $t['usID'] ."'
+                    AND   eaIDAbonne = '". $_SESSION['usID'] ."'";
+        $result = gh_bd_send_request($db, $request);
+
         echo '<li>';
         gh_aff_user_stats(gh_sql_get_user_stats($db, $t['usID']));
         if ($t['usID'] !== $_SESSION['usID']){
             echo '<div class="bouton_sabonner">';
-            if ($t['eaIDAbonne'] == 1) {
+            if (mysqli_num_rows($result) > 0) {
                 echo '<input type="checkbox" name="desabonnement_'. $t['usID'] .'" id="desabonnement_'. $t['usID'] .'" value="'. $t['usID'] .'">',
                      '<label for="abonnement_'. $t['usID'] .'">Se désabonner</label>';
             }else {

@@ -19,8 +19,8 @@ $row;
 if(isset($_POST['recherche'])){
     $db = gh_bd_connect();
     $recherche = gh_bd_proteger_entree($db, $_POST['recherche']);
-    $request = "SELECT DISTINCT users.*, eaIDAbonne
-                FROM users LEFT JOIN estabonne ON users.usID = estabonne.eaIDAbonne
+    $request = "SELECT DISTINCT users.*
+                FROM users
                 WHERE (usPseudo LIKE '%$recherche%' OR usNom LIKE '%$recherche%')";
                 
     $result = gh_bd_send_request($db, $request);

@@ -178,14 +178,19 @@ function gh_aff_blablas(mysqli $db, mysqli_result $r, int $nbToDisplay = 0): voi
                                                         'id', $t['autID'], 'Voir mes infos') : ''),
                     '<br>';
                     // display the blabla, and convert the mentions and tags into links
-                    $blabla = gh_html_proteger_sortie($t['blTexte']);
+                    $blabla = $t['blTexte'];
 
                     $mentions = array();
                     $tags = array();
 
                     // extract mentions and tags
                     preg_match_all('/@([a-zA-Z0-9_]+)/', $blabla, $mentions);
-                    preg_match_all('/#([a-zA-Z0-9_]+)/', $blabla, $tags);
+                    preg_match_all('/(?!\s)#[A-Za-z][A-Za-z0-9_àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅå]*\b/', $blabla, $tags);
+
+                    // echo '<pre>';
+                    // var_dump($tags);
+                    // echo '</pre>';
+                    // die;
 
                     // replace mentions and tags by links
                     foreach ($mentions[1] as $m) {
@@ -197,7 +202,8 @@ function gh_aff_blablas(mysqli $db, mysqli_result $r, int $nbToDisplay = 0): voi
                         $blabla = str_replace('@'.$m, gh_html_a('utilisateur.php', '@'.$m, 'id', $row['usID'], 'Voir les infos de '.$m), $blabla);
                     }
 
-                    foreach ($tags[1] as $tag) {
+                    foreach ($tags[0] as $tag) {
+                        $tag = str_replace('#', '', $tag);
                         $blabla = str_replace('#'.$tag, gh_html_a('tag.php', '#'.$tag, 'tag', $tag, 'Voir les blablas contenant le tag '.$tag), $blabla);
                     }
 

@@ -250,17 +250,11 @@ function gh_aff_user_stats_list(mysqli_result $r, mysqli $db): void {
     echo '<form id="rechercheResultats" action="./sabonner.php" method="post">',
             '<ul>';
     while ($t = mysqli_fetch_assoc($r)) {
-        $request = "SELECT eaIDAbonne
-                    FROM estabonne
-                    WHERE eaIDUser = '". $_SESSION['usID'] ."'
-                    AND   eaIDAbonne = '". $t['usID'] ."'";
-        $result = gh_bd_send_request($db, $request);
-
         echo '<li>';
         gh_aff_user_stats(gh_sql_get_user_stats($db, $t['usID']));
         if ($t['usID'] != $_SESSION['usID']){
             echo '<div class="bouton_sabonner">';
-            if (mysqli_num_rows($result) > 0) {
+            if (gh_sql_check_subscription($db, $_SESSION['usID'], $t['usID'])){
                 echo '<input type="checkbox" name="desabonnement_'. $t['usID'] .'" id="desabonnement_'. $t['usID'] .'" value="'. $t['usID'] .'">',
                      '<label for="abonnement_'. $t['usID'] .'">Se désabonner</label>';
             }else {
@@ -498,4 +492,21 @@ function gh_sql_get_user_stats(mysqli $db, int $id): array {
     $row = mysqli_fetch_array($results);
     $data['nbAbonnements'] = $row[0];
     return gh_html_proteger_sortie($data);
+}
+
+/**
+ * Check if a user subscribed to another user
+ * @param mysqli $db Database connection
+ * @param int    $eaIDUser User's id
+ * @param int    $eaIDAbonne id of the user to check if eaIDUser is subscribed to
+ * @return bool  true if $eaIDUser is subscribed to $eaIDAbonne, false otherwise
+ */
+function gh_sql_check_subscription(mysqli $db, int $eaIDUser, int $eaIDAbonne): bool {
+    $request = "SELECT eaIDAbonne
+                    FROM estabonne
+                    WHERE eaIDUser = '". $eaIDUser ."'
+                    AND eaIDAbonne = '". $eaIDAbonne ."'";
+    $result = gh_bd_send_request($db, $request);
+
+    return (mysqli_num_rows($result) > 0);
 }

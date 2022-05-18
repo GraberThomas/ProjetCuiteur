@@ -422,6 +422,10 @@ footer a:hover {
     font-weight: bold;
 }
 
+#userInfo table input[type="submit"] {
+    position: absolute;
+}
+
 /* ---------------------------------------------------------------
     Reusable elements
 --------------------------------------------------------------- */

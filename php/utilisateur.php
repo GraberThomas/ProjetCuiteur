@@ -107,22 +107,18 @@ mysqli_close($db);
                             }
                     echo'</td>',
                     '</tr>';
+                    echo    '</table>';
 
                 if ($userData['usID'] != $_SESSION['usID']){
-                    echo '<tr>',
-                            '<td>',
-                                '<form action="./sabonner.php" method="post">';
+                    echo '<form action="./sabonner.php" method="post">';
                                     if (gh_sql_check_subscription($db, $_SESSION['usID'], $userData['usID'])){
-                                        echo '<input type="submit" name="btnValiderAbonnement" value="Se désabonner" />',
+                                        echo '<input type="submit" id="validerAbonnement" name="btnValiderAbonnement" value="Se désabonner" />',
                                             '<input type="hidden" name="desabonnement_'. $userData['usID'] .'" value="'. $userData['usID'] .'" />';
                                     } else {
-                                        echo '<input type="submit" name="btnValiderAbonnement" value="S\'abonner" />',
+                                        echo '<input type="submit" id="validerAbonnement" name="btnValiderAbonnement" value="S\'abonner" />',
                                             '<input type="hidden" name="abonnement_'. $userData['usID'] .'" value="'. $userData['usID'] .'" />';
                                     }
-                    echo        '</form>',
-                            '</td>',
-                        '</tr>';
+                    echo '</form>';
                 }
-        echo    '</table>',
             '</article>';
     }

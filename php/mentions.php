@@ -6,7 +6,7 @@ session_start();
 require_once 'bibli_generale.php';
 require_once 'bibli_cuiteur.php';
 
-gh_aff_debut('Cuiteur | Blablas', '../styles/cuiteur.css');
+gh_aff_debut('Cuiteur | Mentions', '../styles/cuiteur.css');
 
 // Les valeurs contenues dans $_POST et $_GET sont de type 'string'.
 // Donc, si cette page est appelée avec l'URL blabla_4.php?id=4, la valeur de $_GET['id'] sera de type string
@@ -33,13 +33,12 @@ if (empty($userStats)){ // user not found, redirect to index
 $nbToDisplay = isset($_GET['numberCuit']) && gh_est_entier($_GET['numberCuit']) &&  $_GET['numberCuit'] > 0 ? $_GET['numberCuit'] : NUMBER_CUIT_DISPLAY;
 $nbToDisplay = (int) gh_bd_proteger_entree($db, $nbToDisplay);
 
-$sql = "SELECT  auteur.usID AS autID, auteur.usPseudo AS autPseudo, auteur.usNom AS autNom, auteur.usAvecPhoto AS autPhoto, 
-                blID, blTexte, blDate, blHeure,
-                origin.usID AS oriID, origin.usPseudo AS oriPseudo, origin.usNom AS oriNom, origin.usAvecPhoto AS oriPhoto
-        FROM (users AS auteur
-        INNER JOIN blablas ON blIDAuteur = usID)
-        LEFT OUTER JOIN users AS origin ON origin.usID = blIDAutOrig
-        WHERE auteur.usID = $usID
+$sql = "SELECT auteur.usID as autID, auteur.usNom as autNom, auteur.usPseudo as autPseudo, auteur.usAvecPhoto as autPhoto, 
+                blDate, blTexte, blHeure, blID, blIDAutOrig as oriID, origin.usNom as oriNom, origin.usPseudo as oriPseudo, origin.usAvecPhoto as oriPhoto
+        FROM (((users AS auteur LEFT OUTER JOIN blablas ON auteur.usID = blIDAuteur) 
+        LEFT OUTER JOIN users AS origin ON blIDAutOrig = origin.usID) 
+        INNER JOIN mentions ON blID = meIDBlabla)
+        WHERE meIDUser = $usID
         ORDER BY blID DESC";
 
 $res = gh_bd_send_request($db, $sql);
@@ -50,16 +49,14 @@ $nbRows = (int) mysqli_num_rows($res);
 - Generating the html code for the page
 ------------------------------------------------------------------------------*/
 
-gh_aff_entete(gh_html_proteger_sortie("Les blablas de {$userStats['usPseudo']}"));
+gh_aff_entete(gh_html_proteger_sortie("Les mentions de {$userStats['usPseudo']}"));
 gh_aff_infos(true);
-
 gh_aff_user_stats($userStats);
-
 echo '<article id="userInfo">
         <ul class="cardsList">';
 
 if ($nbRows == 0){
-    echo '<li id="no_blabla">', gh_html_proteger_sortie($userStats['usPseudo']), ' n\'a pas posté(e) de blabla.</li>';
+    echo '<li id="no_blabla">', gh_html_proteger_sortie($userStats['usPseudo']), ' n\'a jamais été mentionné.</li>';
 }
 else{
     gh_aff_blablas($db, $res, $nbToDisplay);

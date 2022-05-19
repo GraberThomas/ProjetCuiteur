@@ -64,7 +64,7 @@
     }
     
     if ($nbRows == 0){
-        echo '<li>Votre fil de blablas est vide</li>';
+        echo '<li id="no_blabla">Votre fil de blablas est vide</li>';
     }
     else{
         gh_aff_blablas($db, $res, $nbToDisplay);

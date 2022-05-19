@@ -287,6 +287,10 @@ strong {
     font-weight: bold;
 }
 
+li#no_blabla {
+    min-height: 30px;
+}
+
 /* ---------------------------------------------------------------
     FORMULAIRE
 --------------------------------------------------------------- */
@@ -418,10 +422,6 @@ footer a:hover {
     font-weight: bold;
 }
 
-#userInfo table input[type="submit"] {
-    position: absolute;
-}
-
 /* ---------------------------------------------------------------
     Reusable elements
 --------------------------------------------------------------- */
@@ -441,6 +441,15 @@ footer a:hover {
 
 .userStats + .userInfo {
     clear: both;
+}
+
+.cardsList {
+    position: relative;
+}
+
+.cardsList input[type="submit"] {
+    position: absolute;
+    left: 180px;
 }
 
 .cardsList td, .cardsList li{

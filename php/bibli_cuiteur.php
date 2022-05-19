@@ -230,6 +230,8 @@ function gh_aff_blablas(mysqli $db, mysqli_result $r, int $nbToDisplay = 0): voi
 * @param array  $data       Array containing user's stats
 */
 function gh_aff_user_stats(array $data): void {
+    $data = gh_html_proteger_sortie($data);
+
     $photoProfilPath = $data['usAvecPhoto'] == '1' ? '../upload/'. $data['usID'] .'.jpg' : '../images/anonyme.jpg';
         echo '<p class="userStats">',
                 '<img src="', $photoProfilPath, '" alt="Photo de profil" class="photoProfil">',
@@ -247,10 +249,14 @@ function gh_aff_user_stats(array $data): void {
 *
 * @param mysqli_result  $r           Result of the SELECT query
 * @param mysqli         $db          Database connection
+* @param array          $data        Array containing user's stats
 */
-function gh_aff_user_stats_list(mysqli_result $r, mysqli $db): void {
-    echo '<form class="cardsList" action="./sabonner.php" method="post">',
-            '<ul>';
+function gh_aff_user_stats_list(mysqli_result $r, mysqli $db, array $data = array()): void {
+    echo '<form class="cardsList" action="./sabonner.php" method="post">';
+    if(count($data) != 0){
+        gh_aff_user_stats($data);
+    }
+    echo '<ul class="cardsList">';
     while ($t = mysqli_fetch_assoc($r)) {
         echo '<li>';
         gh_aff_user_stats(gh_sql_get_user_stats($db, $t['usID']));

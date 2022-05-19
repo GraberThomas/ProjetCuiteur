@@ -6,6 +6,11 @@ session_start();
 require_once 'bibli_generale.php';
 require_once 'bibli_cuiteur.php';
 
+if(!gh_est_authentifie()){
+    header('Location: ../index.php');
+    exit;
+}
+
 gh_aff_debut('Cuiteur | Blablas', '../styles/cuiteur.css');
 
 // Les valeurs contenues dans $_POST et $_GET sont de type 'string'.

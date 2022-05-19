@@ -36,9 +36,9 @@
                     OR      meIDUser = $usID
                     ORDER BY blID DESC";
 
-    $nbRows = (int) mysqli_num_rows(gh_bd_send_request($db, $sqlBlablas));
-
     $res = gh_bd_send_request($db, $sqlBlablas);
+
+    $nbRows = (int) mysqli_num_rows($res);
 
 
     /*-----------------------------------------------------------------------------
@@ -53,7 +53,7 @@
         gh_aff_entete();
     }
     gh_aff_infos(true);
-    echo '<ul>';
+    echo '<ul class="cardsList">';
 
     if (count($er) > 0) {
         echo '<p class="error" id="error_input_cuit">Les erreurs suivantes ont été détectées :';

@@ -1,0 +1,92 @@
+<?php
+
+ob_start(); // start buffer
+session_start();
+
+require_once 'bibli_generale.php';
+require_once 'bibli_cuiteur.php';
+
+gh_aff_debut('Cuiteur | Blablas', '../styles/cuiteur.css');
+
+// Les valeurs contenues dans $_POST et $_GET sont de type 'string'.
+// Donc, si cette page est appelée avec l'URL blabla_4.php?id=4, la valeur de $_GET['id'] sera de type string
+// => is_int($_GET['id']) renverra false
+// => Il faut utiliser is_numeric() pour déterminer si la valeur de $_GET['id'] est une chaine numérique
+// C'est ce qui est fait dans la fonction gh_est_entier()
+if (count($_GET) > 2 || ! isset($_GET['id']) || ! gh_est_entier(($_GET['id'])) || $_GET['id'] <= 0){
+    $usID = $_SESSION['usID'];
+}
+else {
+    $usID = (int)$_GET['id'];
+}
+
+$db = gh_bd_connect();
+
+/*------------------------------------------------------------------------------
+- Get blablas of user $id
+------------------------------------------------------------------------------*/
+$nbToDisplay = isset($_GET['numberCuit']) && gh_est_entier($_GET['numberCuit']) &&  $_GET['numberCuit'] > 0 ? $_GET['numberCuit'] : NUMBER_CUIT_DISPLAY;
+$nbToDisplay = (int) gh_bd_proteger_entree($db, $nbToDisplay);
+
+$sql = "SELECT  auteur.usID AS autID, auteur.usPseudo AS autPseudo, auteur.usNom AS autNom, auteur.usAvecPhoto AS autPhoto, 
+                blID, blTexte, blDate, blHeure,
+                origin.usID AS oriID, origin.usPseudo AS oriPseudo, origin.usNom AS oriNom, origin.usAvecPhoto AS oriPhoto
+        FROM (users AS auteur
+        LEFT OUTER JOIN blablas ON blIDAuteur = usID)
+        LEFT OUTER JOIN users AS origin ON origin.usID = blIDAutOrig
+        WHERE auteur.usID = $usID
+        ORDER BY blID DESC";
+
+$res = gh_bd_send_request($db, $sql);
+
+$nbRows = (int) mysqli_num_rows($res);
+
+if (mysqli_num_rows($res) == 0){
+    // libération des ressources
+    mysqli_free_result($res);
+    mysqli_close($db);
+    
+    // call the page again for the current user
+    header('Location: blablas.php?id='.$_SESSION['usID']);
+}
+
+/*------------------------------------------------------------------------------
+- Generating the html code for the page
+------------------------------------------------------------------------------*/
+
+$t = mysqli_fetch_assoc($res);
+
+gh_aff_entete(gh_html_proteger_sortie("Les blablas de {$t['autPseudo']}"));
+gh_aff_infos(true);
+
+$userStats = gh_sql_get_user_stats($db, $usID);
+gh_aff_user_stats($userStats);
+
+echo '<article id="userInfo">
+        <ul class="cardsList">';
+
+if ($nbRows == 0){
+    echo '<li>', gh_html_proteger_sortie($t['autPseudo']), ' n\'a pas publié de message</li>';
+}
+else{
+    gh_aff_blablas($db, $res, $nbToDisplay);
+    echo '<li class="plusBlablas">';
+        if ($nbRows > $nbToDisplay){
+            echo '<a href="blablas.php?id='.$usID.'&numberCuit=',$nbToDisplay+NUMBER_CUIT_DISPLAY,'"><strong>Plus de blablas</strong></a>',
+                 '<img src="../images/speaker.png" width="75" height="82" alt="Image du speaker \'Plus de blablas\'">';
+        }
+    echo '</li>';
+}
+
+echo    '</ul>',
+    '</article>';
+
+// libération des ressources
+mysqli_free_result($res);
+mysqli_close($db);
+
+gh_aff_pied();
+gh_aff_fin();
+
+// facultatif car fait automatiquement par PHP
+ob_end_flush();

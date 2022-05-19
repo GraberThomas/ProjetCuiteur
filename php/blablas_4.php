@@ -1,6 +1,7 @@
 <?php
 
 ob_start(); //démarre la bufferisation
+session_start();
 
 require_once 'bibli_generale.php';
 require_once 'bibli_cuiteur.php';
@@ -30,7 +31,7 @@ $id = (int)$_GET['id']; //on n'est jamais trop prudent
 // 1ère jointure externe pour que la requête renvoie un enregistrement quand un utilisateur enregistré n'a pas encore publié de blabla
 // Notez l'utilisation de guillemets doubles
 $sql = "SELECT  auteur.usID AS autID, auteur.usPseudo AS autPseudo, auteur.usNom AS autNom, auteur.usAvecPhoto AS autPhoto, 
-                blTexte, blDate, blHeure,
+                blID, blTexte, blDate, blHeure,
                 origin.usID AS oriID, origin.usPseudo AS oriPseudo, origin.usNom AS oriNom, origin.usAvecPhoto AS oriPhoto
         FROM (users AS auteur
         LEFT OUTER JOIN blablas ON blIDAuteur = usID)

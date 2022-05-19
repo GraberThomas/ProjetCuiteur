@@ -369,10 +369,6 @@ main input[type="submit"]:hover, main input[type="reset"]:hover {
     margin-left: -5px;
 }
 
-#rechercheResultats li{
-    min-height: 50px;
-}
-
 .bouton_sabonner {
     text-align: right;
     font-weight: bold;
@@ -445,4 +441,8 @@ footer a:hover {
 
 .userStats + .userInfo {
     clear: both;
+}
+
+.cardsList td, .cardsList li{
+    min-height: 55px;
 }

@@ -154,6 +154,8 @@ function gh_aff_pied(): void{
 * @param mysqli         $db          Database connection
 */
 function gh_aff_blablas(mysqli $db, mysqli_result $r, int $nbToDisplay = 0): void {
+    mysqli_data_seek($r , 0);
+
     $t = mysqli_fetch_assoc($r);
     for ($i = 0; $t != NULL && ($nbToDisplay === 0 || $i < $nbToDisplay); $i++) {
         if ($t['oriID'] === null){
@@ -247,7 +249,7 @@ function gh_aff_user_stats(array $data): void {
 * @param mysqli         $db          Database connection
 */
 function gh_aff_user_stats_list(mysqli_result $r, mysqli $db): void {
-    echo '<form id="rechercheResultats" action="./sabonner.php" method="post">',
+    echo '<form class="cardsList" action="./sabonner.php" method="post">',
             '<ul>';
     while ($t = mysqli_fetch_assoc($r)) {
         echo '<li>';

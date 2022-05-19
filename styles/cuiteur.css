@@ -239,6 +239,10 @@ main li:not(.plusBlablas) {
     padding: 5px 5px 5px 35px;
     border-radius: 5px;
 }
+
+ul.cardsList li.noBackground{
+    background: none;
+}
     
 .imgAuteur {
     float: left;
@@ -378,11 +382,6 @@ main input[type="submit"]:hover, main input[type="reset"]:hover {
     font-weight: bold;
 }
 
-#rechercheResultats input[type="submit"]{
-    margin-top: 15px;
-    margin-left: 220px;
-}
-
 /* ---------------------------------------------------------------
     BLOC PIED DE PAGE
 --------------------------------------------------------------- */
@@ -407,10 +406,6 @@ footer a:hover {
 /* ---------------------------------------------------------------
     User's info
 --------------------------------------------------------------- */
-#userInfo {
-    margin-top: 50px;
-}
-
 #userInfo table td {
     padding: 7px;
 }
@@ -443,11 +438,13 @@ footer a:hover {
     clear: both;
 }
 
-.cardsList input[type="submit"] {
-    margin-top: 20px;
-    margin-left: 200px;
-}
-
 .cardsList td, .cardsList li{
     min-height: 55px;
+}
+
+
+
+input[type="submit"]#validerAbonnement{
+    margin-top: 15px;
+    margin-left: 200px;
 }

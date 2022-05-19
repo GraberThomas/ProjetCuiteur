@@ -252,11 +252,13 @@ function gh_aff_user_stats(array $data): void {
 * @param array          $data        Array containing user's stats
 */
 function gh_aff_user_stats_list(mysqli_result $r, mysqli $db, array $data = array()): void {
-    echo '<form class="cardsList" action="./sabonner.php" method="post">';
-    if(count($data) != 0){
-        gh_aff_user_stats($data);
-    }
+    echo '<form action="./sabonner.php" method="post">';
     echo '<ul class="cardsList">';
+    if(count($data) != 0){
+        echo '<li class="noBackground">';
+        gh_aff_user_stats($data);
+        echo '</li>';
+    }
     while ($t = mysqli_fetch_assoc($r)) {
         echo '<li>';
         gh_aff_user_stats(gh_sql_get_user_stats($db, $t['usID']));
@@ -273,7 +275,7 @@ function gh_aff_user_stats_list(mysqli_result $r, mysqli $db, array $data = arra
         }
         echo '</li>';
     }
-    echo '</ul><input type=submit name="btnValiderAbonnement" value="Valider"></form>';
+    echo '</ul><input id="validerAbonnement" type=submit name="btnValiderAbonnement" value="Valider"></form>';
 }
 //_______________________________________________________________
 /**

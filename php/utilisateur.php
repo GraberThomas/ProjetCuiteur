@@ -42,7 +42,10 @@ gh_aff_debut('Cuiteur | Profil de '. $userStats['usPseudo'], '../styles/cuiteur.
 gh_aff_entete('Le profil de '. $userStats['usPseudo']);
 gh_aff_infos(true);
 
+echo  '<ul class="cardsList">',
+        '<li class="noBackground">';
 gh_aff_user_stats($userStats);
+echo '</li></ul>';
 gh_aff_user_info($db, $userData);
 
 gh_aff_pied();

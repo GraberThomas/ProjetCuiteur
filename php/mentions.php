@@ -56,9 +56,11 @@ $nbRows = (int) mysqli_num_rows($res);
 
 gh_aff_entete(gh_html_proteger_sortie("Les mentions de {$userStats['usPseudo']}"));
 gh_aff_infos(true);
+
+echo  '<ul class="cardsList">',
+        '<li class="noBackground">';
 gh_aff_user_stats($userStats);
-echo '<article id="userInfo">
-        <ul class="cardsList">';
+echo '</li>';
 
 if ($nbRows == 0){
     echo '<li id="no_blabla">', gh_html_proteger_sortie($userStats['usPseudo']), ' n\'a jamais été mentionné.</li>';

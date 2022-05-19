@@ -54,7 +54,11 @@ echo '<form  id="recherche" action="recherche.php" method="post">',
         '</table>',
     '</form>';
 if(isset($_POST['recherche']) && $_POST['recherche'] != ''){
-    gh_aff_user_stats_list($result, $db);
+    if (mysqli_num_rows($result) == 0) {
+        echo '<p class="error">Aucun utilisateur ne correspond à votre recherche</p>';
+    } else {
+        gh_aff_user_stats_list($result, $db);
+    }
     // free resources
     mysqli_free_result($result);
     mysqli_close($db);

@@ -11,7 +11,7 @@ if(!gh_est_authentifie()){
     exit;
 }
 
-gh_aff_debut('Cuiteur | Abonnements', '../styles/cuiteur.css');
+gh_aff_debut('Cuiteur | Abonnés', '../styles/cuiteur.css');
 
 // Les valeurs contenues dans $_POST et $_GET sont de type 'string'.
 // Donc, si cette page est appelée avec l'URL blabla_4.php?id=4, la valeur de $_GET['id'] sera de type string
@@ -35,8 +35,8 @@ if (empty($userStats)){ // user not found, redirect to index
 /*------------------------------------------------------------------------------
 - Get blablas of user $id
 ------------------------------------------------------------------------------*/
-$sql = "SELECT eaIDAbonne as usID
-        FROM users INNER JOIN estabonne ON usID=eaIDUser
+$sql = "SELECT eaIDUser as usID
+        FROM users INNER JOIN estabonne ON usID=eaIDAbonne
         AND usID=$usID;";
 
 $res = gh_bd_send_request($db, $sql);
@@ -45,13 +45,15 @@ $res = gh_bd_send_request($db, $sql);
 - Generating the html code for the page
 ------------------------------------------------------------------------------*/
 
-gh_aff_entete(gh_html_proteger_sortie("Les abonnements de {$userStats['usPseudo']}"));
+gh_aff_entete(gh_html_proteger_sortie("Les abonnés de {$userStats['usPseudo']}"));
 gh_aff_infos(true);
 
 if (mysqli_num_rows($res) == 0){
-    echo '<ul class="cardsList">', '<li class="noBackground">';
+    echo '<ul class="cardsList">',
+            '<li class="noBackground">';
     gh_aff_user_stats($userStats);
-    echo '</li><li id="no_blabla">', gh_html_proteger_sortie($userStats['usPseudo']), ' n\'a aucun abonnement.</li></ul>';
+    echo '</li>',
+         '<li id="no_blabla">', gh_html_proteger_sortie($userStats['usPseudo']), ' n\'a aucun abonné.</li></ul>';
 }
 else{
     gh_aff_user_stats_list($res, $db, $userStats);

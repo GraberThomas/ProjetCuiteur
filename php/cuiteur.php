@@ -105,7 +105,7 @@
 
         // check for mentions
         $mentions = array();
-        $regex = '/@([a-zA-Z0-9_]+)/';
+        $regex = '/@([a-zA-Z0-9_àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅå]+)/';
         preg_match_all($regex, $message, $mentions);
         $mentions = array_unique($mentions[1]);
 
@@ -118,7 +118,7 @@
         }
         // check for tags
         $tags = array();
-        $regex = '/#([a-zA-Z0-9_]+)/';
+        $regex = '/#([a-zA-Z0-9_àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅå]+)/';
         preg_match_all($regex, $message, $tags);
         $tags = array_unique($tags[1]);
 

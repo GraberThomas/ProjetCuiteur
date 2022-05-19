@@ -186,14 +186,14 @@ function gh_aff_blablas(mysqli $db, mysqli_result $r, int $nbToDisplay = 0): voi
                     $tags = array();
 
                     // extract mentions and tags
-                    preg_match_all('/(?<=@)\w+/', $blabla, $mentions);
+                    preg_match_all('/@([a-zA-Z0-9_àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅå]+)/', $blabla, $mentions);
                     preg_match_all('/(?!\s)#[A-Za-z][A-Za-z0-9_àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅå]*\b/', $blabla, $tags);
 
-                    $mentions[0] = array_unique($mentions[0]);
+                    $mentions[1] = array_unique($mentions[1]);
                     $tags[0] = array_unique($tags[0]);
 
                     // replace mentions and tags by links
-                    foreach ($mentions[0] as $m) {
+                    foreach ($mentions[1] as $m) {
                         $sqlGetUserId = "SELECT usID
                                          FROM   users
                                          WHERE  usPseudo = '$m'";

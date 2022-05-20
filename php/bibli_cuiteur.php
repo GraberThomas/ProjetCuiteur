@@ -211,10 +211,11 @@ function gh_aff_blablas(mysqli $db, mysqli_result $r, int $nbToDisplay = 0): voi
                     '<p class="finMessage">',
                     gh_amj_clair($t['blDate']), ' à ', gh_heure_clair($t['blHeure']);
                     if ($t['autID'] == $_SESSION['usID']){
-                        echo '<a href="./supprimer_blabla.php?idBlabla='.$t['blID'].'">Supprimer</a></p>';
+                        $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+                        echo '<a href="./supprimer_blabla.php?idBlabla='.urlencode($t['blID']).'&from='.urlencode($actual_link).'">Supprimer</a></p>';
                     }
                     else {
-                        echo '<a href="../index.php?repondre='.$pseudo_orig.'">Répondre</a> <a href="./recuit.php?idBlabla='.$t['blID'].'">Recuiter</a></p>';
+                        echo '<a href="../index.php?repondre='.urlencode($pseudo_orig).'">Répondre</a> <a href="./recuit.php?idBlabla='.urlencode($t['blID']).'">Recuiter</a></p>';
                     }
             echo '</li>';
         $t = mysqli_fetch_assoc($r);

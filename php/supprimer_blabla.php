@@ -8,7 +8,7 @@ if(!gh_est_authentifie()){
     header('Location: ../index.php');
     exit;
 }
-if(!isset($_GET['idBlabla'])){
+if(!isset($_GET['idBlabla']) || !isset($_GET['from'])){
     header('Location: ../index.php');
     exit;
 }
@@ -42,5 +42,5 @@ gh_bd_send_request($db, $request);
 
 mysqli_close($db);
 
-header('Location: ../index.php');
+header('Location: '.$_GET['from']);
 ?>

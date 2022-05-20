@@ -45,13 +45,13 @@ $res = gh_bd_send_request($db, $sql);
 - Generating the html code for the page
 ------------------------------------------------------------------------------*/
 
-gh_aff_entete(gh_html_proteger_sortie("Les abonnements de {$userStats['usPseudo']}"));
+gh_aff_entete("Les abonnements de {$userStats['usPseudo']}");
 gh_aff_infos(true);
 
 if (mysqli_num_rows($res) == 0){
     echo '<ul class="cardsList">', '<li class="noBackground">';
     gh_aff_user_stats($userStats);
-    echo '</li><li id="no_blabla">', gh_html_proteger_sortie($userStats['usPseudo']), ' n\'a aucun abonnement.</li></ul>';
+    echo '</li><li id="no_blabla">', $userStats['usPseudo'], ' n\'a aucun abonnement.</li></ul>';
 }
 else{
     gh_aff_user_stats_list($res, $db, $userStats);

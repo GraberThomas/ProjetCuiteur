@@ -45,7 +45,7 @@ $res = gh_bd_send_request($db, $sql);
 - Generating the html code for the page
 ------------------------------------------------------------------------------*/
 
-gh_aff_entete(gh_html_proteger_sortie("Les abonnés de {$userStats['usPseudo']}"));
+gh_aff_entete("Les abonnés de {$userStats['usPseudo']}");
 gh_aff_infos(true);
 
 if (mysqli_num_rows($res) == 0){
@@ -53,7 +53,7 @@ if (mysqli_num_rows($res) == 0){
             '<li class="noBackground">';
     gh_aff_user_stats($userStats);
     echo '</li>',
-         '<li id="no_blabla">', gh_html_proteger_sortie($userStats['usPseudo']), ' n\'a aucun abonné.</li></ul>';
+         '<li id="no_blabla">', $userStats['usPseudo'], ' n\'a aucun abonné.</li></ul>';
 }
 else{
     gh_aff_user_stats_list($res, $db, $userStats);

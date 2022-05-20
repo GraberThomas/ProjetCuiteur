@@ -55,7 +55,7 @@ $nbRows = (int) mysqli_num_rows($res);
 - Generating the html code for the page
 ------------------------------------------------------------------------------*/
 
-gh_aff_entete(gh_html_proteger_sortie("Les blablas de {$userStats['usPseudo']}"));
+gh_aff_entete("Les blablas de {$userStats['usPseudo']}");
 gh_aff_infos(true);
 
 echo  '<ul class="cardsList">',
@@ -64,7 +64,7 @@ gh_aff_user_stats($userStats);
 echo '</li>';
 
 if ($nbRows == 0){
-    echo '<li id="no_blabla">', gh_html_proteger_sortie($userStats['usPseudo']), ' n\'a pas posté(e) de blabla.</li>';
+    echo '<li id="no_blabla">', $userStats['usPseudo'], ' n\'a pas posté(e) de blabla.</li>';
 }
 else{
     gh_aff_blablas($db, $res, $nbToDisplay);

@@ -228,7 +228,7 @@ function gh_aff_blablas(mysqli $db, mysqli_result $r, int $nbToDisplay = 0): voi
 * @param array  $data       Array containing user's stats
 */
 function gh_aff_user_stats(array $data): void {
-    $data = gh_html_proteger_sortie($data);
+    //$data = gh_html_proteger_sortie($data);
 
     $photoProfilPath = $data['usAvecPhoto'] == '1' ? '../upload/'. $data['usID'] .'.jpg' : '../images/anonyme.jpg';
         echo '<p class="userStats">',

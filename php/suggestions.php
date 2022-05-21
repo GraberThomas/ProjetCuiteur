@@ -46,7 +46,12 @@ $res = gh_bd_send_request($db, $sql);
 gh_aff_entete("Suggestions");
 gh_aff_infos(true);
 
-gh_aff_user_stats_list($res, $db);
+if (mysqli_num_rows($res) == 0){
+    echo '<ul class="cardsList"><li id="no_blabla">Aucune suggestion disponible.</li></ul>';
+}
+else{
+    gh_aff_user_stats_list($res, $db);
+}
 
 // libération des ressources
 mysqli_free_result($res);

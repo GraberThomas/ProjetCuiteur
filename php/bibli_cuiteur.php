@@ -47,6 +47,8 @@ define('MAX_PHOTO_PROFILE_WEIGHT_KB', 20); // in kB
 define("NB_SUGGESTIONS",5);
 define("NB_MOST_POPULAR_USERS",10);
 
+define("NB_TENDS_TO_DISPLAY",10);
+
 //_______________________________________________________________
 /**
  * Génération et affichage de l'entete des pages
@@ -78,7 +80,13 @@ function gh_aff_entete(?string $titre = null, bool $connected=true, string $mess
                 '<input type="submit" name="btnPublish" value="" title="Publier mon message">',
             '</form>';   
     }else{
-        echo    '<h1>', $titre, '</h1>';
+        if($titre == ''){
+            echo    '<h1 id="no_title">', $titre, '</h1>';
+
+        }else{
+            echo    '<h1>', $titre, '</h1>';
+        }
+        
     }
     echo    '</header>';    
 }
@@ -207,7 +215,7 @@ function gh_aff_blablas(mysqli $db, mysqli_result $r, int $nbToDisplay = 0): voi
 
                     foreach ($tags[0] as $tag) {
                         $tag = str_replace('#', '', $tag);
-                        $blabla = str_replace('#'.$tag, gh_html_a('tag.php', '#'.$tag, 'tag', $tag, 'Voir les blablas contenant le tag '.$tag), $blabla);
+                        $blabla = str_replace('#'.$tag, gh_html_a('tendances.php', '#'.$tag, 'hashtag', $tag, 'Voir les blablas contenant le tag '.$tag), $blabla);
                     }
 
                     echo $blabla,
@@ -279,6 +287,35 @@ function gh_aff_user_stats_list(mysqli_result $r, mysqli $db, array $data = arra
     }
     echo '</ul><input id="validerAbonnement" type=submit name="btnValiderAbonnement" value="Valider"></form>';
 }
+//_______________________________________________________________
+/**
+     * Display a list of tends
+     * 
+     * @param mysqli_result $result
+     * @param bool          $showHashTag Wether to show the hashtag or not. Shpw an ordoned list of tends if not.
+     */
+    function gh_aff_liste_tendances(mysqli_result $result, bool $showHashTag = false) {
+        if($showHashTag == false){
+            echo '<ol>';
+        }else{
+            echo '<ul>';
+        }
+        while($res = mysqli_fetch_assoc($result)){
+            echo '<li class="li_tendances">';
+            if($showHashTag) {
+                echo '#', gh_html_a('./tendances.php?hashtag='.$res['taID'], $res['taID']);
+            }
+            else {
+                echo gh_html_a('./tendances.php?hashtag='.$res['taID'], $res['taID'].' ('.$res['nbTags'].')');
+            }
+            echo '</li>';
+        }
+        if($showHashTag == false){
+            echo '</ol>';
+        }else{
+            echo '</ul>';
+        }
+    }
 //_______________________________________________________________
 /**
 * Détermine si l'utilisateur est authentifié

@@ -233,7 +233,7 @@ main{
     margin: 20px 0 0 250px;
 }
     
-main li:not(.plusBlablas) {
+main li:not(.plusBlablas):not(.li_tendances) {
     background: url(../images/fond_blabla.png);
     margin: 0 0 10px 25px;
     padding: 5px 5px 5px 35px;
@@ -445,4 +445,29 @@ footer a:hover {
 input[type="submit"]#validerAbonnement{
     margin-top: 15px;
     margin-left: 200px;
+}
+
+
+h2.title_tendances{
+    font-size:18px;
+    font-weight:bold;
+    margin-bottom: 5px;;
+}
+
+ol{
+    list-style-type: number;
+    margin-left: 50px;
+    margin-bottom: 20px;
+}
+
+li.li_tendances{
+    margin-bottom: 10px;
+}
+
+div#tend_year{
+    margin-top: 40px;
+}
+
+h1#no_title{
+    min-height: 28px;
 }

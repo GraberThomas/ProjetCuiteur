@@ -16,7 +16,7 @@ $db = gh_bd_connect();
 gh_aff_debut('Cuiteur | Suggestions', '../styles/cuiteur.css');
 
 /*------------------------------------------------------------------------------
-- Get blablas of user $id
+- Get suggestions for current user
 ------------------------------------------------------------------------------*/
 $sql = "((SELECT DISTINCT usID
           FROM users INNER JOIN estabonne ON usID=eaIDAbonne

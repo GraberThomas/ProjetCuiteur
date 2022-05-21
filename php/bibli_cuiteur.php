@@ -44,6 +44,9 @@ define('AGE_MAX', 120);
 define("NUMBER_CUIT_DISPLAY",4);
 define('MAX_PHOTO_PROFILE_WEIGHT_KB', 20); // in kB
 
+define("NB_SUGGESTIONS",5);
+define("NB_MOST_POPULAR_USERS",10);
+
 //_______________________________________________________________
 /**
  * Génération et affichage de l'entete des pages

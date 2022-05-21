@@ -168,7 +168,7 @@ ob_end_flush();
             echo '<p>Aucune tendance pour ce hashtag.</p>';
         }
         else {
-            echo '<ul>';
+            echo '<ul class="cardsList">';
             gh_aff_blablas($db, $res);
             echo '</ul>';
         }

@@ -49,6 +49,10 @@ define("NB_MOST_POPULAR_USERS",10);
 
 define("NB_TENDS_TO_DISPLAY",10);
 
+// param for aside
+define("NB_TENDS_ASIDE",5);
+define("NB_SUGGESTIONS_ASIDE",2);
+
 //_______________________________________________________________
 /**
  * Génération et affichage de l'entete des pages
@@ -115,15 +119,17 @@ function gh_aff_infos(bool $connecte = true, mysqli $db = null):void{
                 '<li>', gh_html_a('./abonnements.php', $userData['nbAbonnements']. ' ' . ($userData['nbAbonnements'] > '1' ? 'abonnements' : 'abonnement'), 'id', $userData['usID'], 'Voir les personnes que je suis'), '</li>',
                 '<li>', gh_html_a('./abonnes.php', $userData['nbAbonnes']. ' ' . ($userData['nbAbonnes'] > '1' ? 'abonnés' : 'abonné'), 'id', $userData['usID'], 'Voir les personnes qui me suivent'), '</li>',                
             '</ul>',
-            '<h3>Tendances</h3>',
-            '<ul>',
-                '<li>#<a href="../index.php" title="Voir les blablas contenant ce tag">info</a></li>',
-                '<li>#<a href="../index.php" title="Voir les blablas contenant ce tag">lol</a></li>',
-                '<li>#<a href="../index.php" title="Voir les blablas contenant ce tag">imbécile</a></li>',
-                '<li>#<a href="../index.php" title="Voir les blablas contenant ce tag">fairelafete</a></li>',
-                '<li><a href="../index.php">Toutes les tendances</a><li>',
-            '</ul>',
-            '<h3>Suggestions</h3>',             
+
+            '<h3>Tendances</h3>';
+            $sqlTends = 'SELECT taID
+                         FROM tags
+                        GROUP BY taID
+                        ORDER BY COUNT(*) DESC, taID ASC
+                        LIMIT '. NB_TENDS_ASIDE .';';
+            $resTends = gh_bd_send_request($db, $sqlTends);
+            gh_aff_liste_tendances($resTends, true);
+            mysqli_free_result($resTends);
+        echo'<h3>Suggestions</h3>',             
             '<ul>',
                 '<li>',
                     '<img class="photoProfil" src="../images/yoda.jpg" alt="photo de l\'utilisateur">',
@@ -305,7 +311,12 @@ function gh_aff_user_stats_list(mysqli_result $r, mysqli $db, array $data = arra
             echo '<ul>';
         }
         while($res = mysqli_fetch_assoc($result)){
-            echo '<li class="li_tendances">';
+            if($showHashTag == false){
+                echo '<li class="li_tendances">';
+            }
+            else {
+                echo '<li>';
+            }
             if($showHashTag) {
                 echo '#', gh_html_a('./tendances.php?hashtag='.$res['taID'], $res['taID']);
             }
@@ -317,7 +328,8 @@ function gh_aff_user_stats_list(mysqli_result $r, mysqli $db, array $data = arra
         if($showHashTag == false){
             echo '</ol>';
         }else{
-            echo '</ul>';
+            echo    '<li>', gh_html_a('./tendances.php', 'Toutes les tendances'), '</li>',
+                 '</ul>';
         }
     }
 //_______________________________________________________________

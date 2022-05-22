@@ -96,20 +96,24 @@ function gh_aff_entete(?string $titre = null, bool $connected=true, string $mess
  * Génération et affichage du bloc d'informations utilisateur
  *
  * @param bool    $connecte  true si l'utilisateur courant s'est authentifié, false sinon
+ * @param mysqli  $dn        objet mysqli de la connexion à la base de données
  */
-function gh_aff_infos(bool $connecte = true):void{
+function gh_aff_infos(bool $connecte = true, mysqli $db = null):void{
     echo '<aside>';
     if ($connecte){
+        $userData = gh_sql_get_user_stats($db, $_SESSION['usID']);     
+
         echo
             '<h3>Utilisateur</h3>',
             '<ul>',
                 '<li>',
-                    '<img class="photoProfil" src="../images/pdac.jpg" alt="photo de l\'utilisateur">',
-                    '<a href="../index.php" title="Voir mes infos">pdac</a> Pierre Dac',
+                    '<img class="photoProfil" src="../', ($userData['usAvecPhoto'] == 1 ? "upload/$userData[usID].jpg" : 'images/anonyme.jpg'), 
+                    '" alt="photo de l\'utilisateur">',
+                    gh_html_a('./utilisateur.php', $userData['usPseudo'], 'id', $userData['usID'], 'Voir mes infos'), ' ', $userData['usNom'],   
                 '</li>',
-                '<li><a href="../index.php" title="Voir la liste de mes messages">100 blablas</a></li>',
-                '<li><a href="../index.php" title="Voir les personnes que je suis">123 abonnements</a></li>',
-                '<li><a href="../index.php" title="Voir les personnes qui me suivent">34 abonnés</a></li>',                 
+                '<li>', gh_html_a('./blablas.php', $userData['nbBlablas']. ' ' . ($userData['nbBlablas'] > '1' ? 'blablas' : 'blabla'), 'id', $userData['usID'], 'Voir la liste de mes messages'), '</li>',
+                '<li>', gh_html_a('./abonnements.php', $userData['nbAbonnements']. ' ' . ($userData['nbAbonnements'] > '1' ? 'abonnements' : 'abonnement'), 'id', $userData['usID'], 'Voir les personnes que je suis'), '</li>',
+                '<li>', gh_html_a('./abonnes.php', $userData['nbAbonnes']. ' ' . ($userData['nbAbonnes'] > '1' ? 'abonnés' : 'abonné'), 'id', $userData['usID'], 'Voir les personnes qui me suivent'), '</li>',                
             '</ul>',
             '<h3>Tendances</h3>',
             '<ul>',
@@ -133,7 +137,7 @@ function gh_aff_infos(bool $connecte = true):void{
             '</ul>';
     }
     echo '</aside>',
-         '<main>';   
+         '<main>';  
 }
 
 //_______________________________________________________________

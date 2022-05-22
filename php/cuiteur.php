@@ -52,7 +52,7 @@
     }else {
         gh_aff_entete();
     }
-    gh_aff_infos(true);
+    gh_aff_infos(true, $db);
     echo '<ul class="cardsList">';
 
     if (count($er) > 0) {

@@ -46,7 +46,7 @@ $res = gh_bd_send_request($db, $sql);
 ------------------------------------------------------------------------------*/
 
 gh_aff_entete("Les abonnés de {$userStats['usPseudo']}");
-gh_aff_infos(true);
+gh_aff_infos(true, $db);
 
 if (mysqli_num_rows($res) == 0){
     echo '<ul class="cardsList">',

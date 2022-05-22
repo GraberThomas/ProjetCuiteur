@@ -33,7 +33,7 @@ $erCuiteurAccountSettings = isset($_POST['btnModifyCuiteurAccountSettings']) ? g
 gh_aff_debut('Cuiteur | Compte', '../styles/cuiteur.css');
 
 gh_aff_entete('Paramètres de mon compte', true);
-gh_aff_infos(true);
+gh_aff_infos(true, $db);
 
 echo '<p>Cette page vous permet de modifier les informations relatives à votre compte.</p>',
      '<br>';

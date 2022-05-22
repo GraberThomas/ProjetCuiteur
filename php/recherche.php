@@ -15,14 +15,14 @@ if (! gh_est_authentifie()){
 /*------------------------------------------------------------------------------
 - Do search if form is submitted
 ------------------------------------------------------------------------------*/
-$row;
+$db = gh_bd_connect();
+
 if(isset($_POST['btnRechercher'])){
     if( !gh_parametres_controle('post', array('recherche', 'btnRechercher'))) {
         gh_session_exit();   
     }
 
     if ($_POST['recherche'] != '') {
-        $db = gh_bd_connect();
         $recherche = gh_bd_proteger_entree($db, $_POST['recherche']);
         $request = "SELECT DISTINCT users.*
                     FROM users
@@ -41,7 +41,7 @@ if(isset($_POST['btnRechercher'])){
 gh_aff_debut('Cuiteur | Recherche', '../styles/cuiteur.css');
 
 gh_aff_entete('Rechercher des utilisateurs', true);
-gh_aff_infos(true);
+gh_aff_infos(true, $db);
 
 if (isset($_POST['btnRechercher']) && $_POST['recherche'] == '') {
     echo '<p class="error">Veuillez entrer un terme de recherche</p>';
@@ -61,10 +61,11 @@ if(isset($_POST['recherche']) && $_POST['recherche'] != ''){
     }
     // free resources
     mysqli_free_result($result);
-    mysqli_close($db);
 }
 gh_aff_pied();
 gh_aff_fin();
+
+mysqli_close($db);
 
 // facultatif car fait automatiquement par PHP
 ob_end_flush();

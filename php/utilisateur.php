@@ -40,7 +40,7 @@ if (! $userStats){
 gh_aff_debut('Cuiteur | Profil de '. $userStats['usPseudo'], '../styles/cuiteur.css');
 
 gh_aff_entete('Le profil de '. $userStats['usPseudo']);
-gh_aff_infos(true);
+gh_aff_infos(true, $db);
 
 echo  '<ul class="cardsList">',
         '<li class="noBackground">';

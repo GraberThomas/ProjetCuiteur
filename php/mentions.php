@@ -55,7 +55,7 @@ $nbRows = (int) mysqli_num_rows($res);
 ------------------------------------------------------------------------------*/
 
 gh_aff_entete("Les mentions de {$userStats['usPseudo']}");
-gh_aff_infos(true);
+gh_aff_infos(true, $db);
 
 echo  '<ul class="cardsList">',
         '<li class="noBackground">';

@@ -20,7 +20,7 @@ gh_aff_debut('Cuiteur | Tendances', '../styles/cuiteur.css');
 
 if(count($_GET) != 1 || ! isset($_GET['hashtag'])){
     gh_aff_entete('');
-    gh_aff_infos(true);
+    gh_aff_infos(true, $db);
 
     gh_aff_top_tags_today($db);
     gh_aff_top_tags_week($db);
@@ -30,7 +30,7 @@ if(count($_GET) != 1 || ! isset($_GET['hashtag'])){
     $hashtag = gh_html_proteger_sortie($_GET['hashtag']);
 
     gh_aff_entete($hashtag);
-    gh_aff_infos(true);
+    gh_aff_infos(true, $db);
     gh_aff_selected_tendances($db, $hashtag);
 }
 

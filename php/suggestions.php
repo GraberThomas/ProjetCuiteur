@@ -18,26 +18,7 @@ gh_aff_debut('Cuiteur | Suggestions', '../styles/cuiteur.css');
 /*------------------------------------------------------------------------------
 - Get suggestions for current user
 ------------------------------------------------------------------------------*/
-$sql = "((SELECT DISTINCT usID
-          FROM users INNER JOIN estabonne ON usID=eaIDAbonne
-          WHERE eaIDUser IN (SELECT eaIDAbonne FROM estabonne WHERE eaIDuser=$_SESSION[usID])
-          AND usID!=$_SESSION[usID]
-          AND usID NOT IN (SELECT eaIDAbonne
-                           FROM estabonne
-                           WHERE eaIDUSer=$_SESSION[usID]))
-          UNION
-          (SELECT * FROM (SELECT eaIDAbonne
-                          FROM estabonne
-                          WHERE eaIDAbonne != $_SESSION[usID]
-                          AND eaIDAbonne NOT IN (SELECT eaIDAbonne FROM estabonne WHERE eaIDUser = $_SESSION[usID])
-                          GROUP BY eaIDAbonne
-                          ORDER BY COUNT(*) DESC
-                          LIMIT " . NB_MOST_POPULAR_USERS . "
-                         ) as sz
-          ))
-          ORDER BY RAND()
-          LIMIT " . NB_SUGGESTIONS . ";";
-$res = gh_bd_send_request($db, $sql);
+$res = gh_sql_get_current_user_suggestions($db);
 
 /*------------------------------------------------------------------------------
 - Generating the html code for the page

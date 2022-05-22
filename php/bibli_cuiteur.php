@@ -112,7 +112,7 @@ function gh_aff_infos(bool $connecte = true, mysqli $db = null):void{
             '<ul>',
                 '<li>',
                     '<img class="photoProfil" src="../', ($userData['usAvecPhoto'] == 1 ? "upload/$userData[usID].jpg" : 'images/anonyme.jpg'), 
-                    '" alt="photo de l\'utilisateur">',
+                        '" alt="photo de l\'utilisateur">',
                     gh_html_a('./utilisateur.php', $userData['usPseudo'], 'id', $userData['usID'], 'Voir mes infos'), ' ', $userData['usNom'],   
                 '</li>',
                 '<li>', gh_html_a('./blablas.php', $userData['nbBlablas']. ' ' . ($userData['nbBlablas'] > '1' ? 'blablas' : 'blabla'), 'id', $userData['usID'], 'Voir la liste de mes messages'), '</li>',
@@ -129,18 +129,21 @@ function gh_aff_infos(bool $connecte = true, mysqli $db = null):void{
             $resTends = gh_bd_send_request($db, $sqlTends);
             gh_aff_liste_tendances($resTends, true);
             mysqli_free_result($resTends);
-        echo'<h3>Suggestions</h3>',             
-            '<ul>',
-                '<li>',
-                    '<img class="photoProfil" src="../images/yoda.jpg" alt="photo de l\'utilisateur">',
-                    '<a href="../index.php" title="Voir mes infos">yoda</a> Yoda',
-                '</li>',       
-                '<li>',
-                    '<img class="photoProfil" src="../images/paulo.jpg" alt="photo de l\'utilisateur">',
-                    '<a href="../index.php" title="Voir mes infos">paulo</a> Jean-Paul Sartre',
-                '</li>',
-                '<li><a href="../index.php">Plus de suggestions</a></li>',
+
+        echo'<h3>Suggestions</h3>';
+        $res = gh_sql_get_current_user_suggestions($db, NB_SUGGESTIONS_ASIDE);
+        echo '<ul>';
+        while($row = mysqli_fetch_assoc($res)){
+            echo '<li>',
+                    '<img class="photoProfil" src="../', ($row['usAvecPhoto'] == 1 ? "upload/$row[usID].jpg" : 'images/anonyme.jpg'), 
+                        '" alt="photo de l\'utilisateur">',
+                    gh_html_a('./utilisateur.php', $row['usPseudo'], 'id', $row['usID'], 'Voir mes infos'), ' ', $row['usNom'],
+                '</li>';      
+        }
+        echo    '<li>', gh_html_a('./suggestions.php', 'Plus de suggestions', '', '', 'Voir plus de suggestions'), '</li>',
             '</ul>';
+
+        mysqli_free_result($res);
     }
     echo '</aside>',
          '<main>';  
@@ -558,7 +561,39 @@ function gh_sql_get_user_stats(mysqli $db, int $id): array {
     $data['nbAbonnements'] = $row[0];
     return gh_html_proteger_sortie($data);
 }
+//_______________________________________________________________
+/**
+ * Get suggestions for current user
+ * 
+ * @param mysqli   $mysqli              Database connection
+ * @param int      $nbSuggestions       Number of suggestions to get
+ * @return mysqli_result                Current User suggestions
+ */
+function gh_sql_get_current_user_suggestions(mysqli $db, int $nbSuggestions = NB_SUGGESTIONS): mysqli_result {
+    $sql = "((SELECT DISTINCT usID, usPseudo, usNom, usAvecPhoto
+              FROM users INNER JOIN estabonne ON usID=eaIDAbonne
+              WHERE eaIDUser IN (SELECT eaIDAbonne FROM estabonne WHERE eaIDuser=$_SESSION[usID])
+              AND usID!=$_SESSION[usID]
+              AND usID NOT IN (SELECT eaIDAbonne
+                               FROM estabonne
+                               WHERE eaIDUSer=$_SESSION[usID]))
+              UNION
+              (SELECT usID, usPseudo, usNom, usAvecPhoto FROM (SELECT *
+                                                               FROM users INNER JOIN estabonne ON usID=eaIDAbonne
+                                                               WHERE eaIDAbonne != $_SESSION[usID]
+                                                               AND eaIDAbonne NOT IN (SELECT eaIDAbonne FROM estabonne WHERE eaIDUser = $_SESSION[usID])
+                                                               GROUP BY eaIDAbonne
+                                                               ORDER BY COUNT(*) DESC
+                                                               LIMIT " . NB_MOST_POPULAR_USERS . "
+                                                              ) as sz
+              ))
+              ORDER BY RAND()
+              LIMIT " . $nbSuggestions . ";";
 
+    $res = gh_bd_send_request($db, $sql);
+    return $res;
+}
+//_______________________________________________________________
 /**
  * Check if a user subscribed to another user
  * @param mysqli $db Database connection

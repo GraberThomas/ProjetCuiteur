@@ -27,10 +27,11 @@ if(count($_GET) != 1 || ! isset($_GET['hashtag'])){
     gh_aff_top_tags_month($db);
     gh_aff_top_tags_year($db);
 }else{
-    $hashtag = gh_html_proteger_sortie($_GET['hashtag']);
-
-    gh_aff_entete($hashtag);
+    gh_aff_entete(gh_html_proteger_sortie($_GET['hashtag']));
+    $hashtag = $_GET['hashtag'];
     gh_aff_infos(true, $db);
+    // var_dump($hashtag);
+    // die;
     gh_aff_selected_tendances($db, $hashtag);
 }
 
@@ -162,7 +163,7 @@ ob_end_flush();
                 FROM ((users AS auteur INNER JOIN blablas ON blIDAuteur = usID)
                 LEFT OUTER JOIN users AS origin ON origin.usID = blIDAutOrig)
                 INNER JOIN tags ON blID=taIDBlabla
-                WHERE taID='".gh_bd_proteger_entree($db,$hashtag)."';";
+                WHERE taID='".gh_bd_proteger_entree($db, $hashtag)."';";
         $res = gh_bd_send_request($db, $sql);
         if(mysqli_num_rows($res) == 0){
             echo '<p>Aucune tendance pour ce hashtag.</p>';

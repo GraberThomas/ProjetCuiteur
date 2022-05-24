@@ -297,7 +297,7 @@ function gh_html_proteger_sortie(array|string $content): array|string {
         return $content;
     }
     if (is_string($content)){
-        return htmlentities($content, ENT_QUOTES, 'UTF-8');
+        return htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
     }
     return $content;
 }

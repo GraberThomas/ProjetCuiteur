@@ -38,6 +38,8 @@ define('LMAX_NOMPRENOM', 60); //longueur du champ dans la base de données
 define('LMIN_PASSWORD', 4);
 define('LMAX_PASSWORD', 20);
 
+define('MAX_CHAR_MESSAGE', 255);
+
 define('AGE_MIN', 18);
 define('AGE_MAX', 120);
 
@@ -204,7 +206,7 @@ function gh_aff_blablas(mysqli $db, mysqli_result $r, int $nbToDisplay = 0): voi
                                                         'id', $t['autID'], 'Voir mes infos') : ''),
                     '<br>';
                     // display the blabla, and convert the mentions and tags into links
-                    $blabla = $t['blTexte'];
+                    $blabla = gh_html_proteger_sortie($t['blTexte']);
 
                     $mentions = array();
                     $tags = array();
@@ -231,7 +233,7 @@ function gh_aff_blablas(mysqli $db, mysqli_result $r, int $nbToDisplay = 0): voi
                         $blabla = str_replace('#'.$tag, gh_html_a('tendances.php', '#'.$tag, 'hashtag', $tag, 'Voir les blablas contenant le tag '.$tag), $blabla);
                     }
 
-                    echo $blabla,
+                    echo '<p>'.$blabla.'</p>',
                     '<p class="finMessage">',
                     gh_amj_clair($t['blDate']), ' à ', gh_heure_clair($t['blHeure']);
                     if ($t['autID'] == $_SESSION['usID']){

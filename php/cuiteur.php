@@ -103,6 +103,11 @@
             return $er;
         }
 
+        if (mb_strlen($message) > MAX_CHAR_MESSAGE){
+            $er[] = 'Votre message doit faire au maximum '.MAX_CHAR_MESSAGE .' caractères';
+            return $er;
+        }
+
         // check for mentions
         $mentions = array();
         $regex = '/@([a-zA-Z0-9_àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅå]+)/';

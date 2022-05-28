@@ -125,8 +125,18 @@
         $tags = array();
         $regex = '/#([a-zA-Z0-9_àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅå]+)/';
         preg_match_all($regex, $message, $tags);
-        $tags = array_unique($tags[1]);
-
+        $tags = $tags[1];
+        $tags_without_accent=array();
+        foreach($tags as $tag){
+            //Replace all char with accent on char without accent
+            //Get this solution in https://blog.lecacheur.com/2008/04/08/supprimer-les-accents-utf8-avec-php/
+            $tag = htmlentities($tag, ENT_NOQUOTES, 'utf-8');
+            $tag = preg_replace('#&([A-za-z])(?:uml|circ|tilde|acute|grave|cedil|ring);#', '\1', $tag);
+            $tag = preg_replace('#&([A-za-z]{2})(?:lig);#', '\1', $tag);
+            $tag = preg_replace('#&[^;]+;#', '', $tag);
+            $tags_without_accent[]=$tag;
+        }
+        $tags_without_accent = array_unique($tags_without_accent);
         if (count($er) > 0){
             return $er;
         }
@@ -157,7 +167,7 @@
         }
 
         // insert tags
-        foreach ($tags as $tag){
+        foreach ($tags_without_accent as $tag){
             $sqlInsertTag = "INSERT
                              INTO tags
                              VALUES ('$tag', $messageId)";
